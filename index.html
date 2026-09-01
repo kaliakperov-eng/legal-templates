@@ -55,7 +55,7 @@ input[type="file"]{display:none}
 
 <div class="header">
 <div class="logo">
-<div class="logo-icon">⚖️</div>
+<div class="logo-icon">️</div>
 <div class="logo-text">AREST<span>OF</span></div>
 </div>
 </div>
@@ -64,7 +64,7 @@ input[type="file"]{display:none}
 
 <div class="container">
 <div class="title">🤖 Авто-генератор возражения</div>
-<div class="subtitle">Загрузите PDF — система сама распознает данные и создаст документ</div>
+<div class="subtitle">Загрузите PDF — система автоматически распознает все данные</div>
 
 <div class="upload-zone" onclick="document.getElementById('pdfFile').click()">
 <div class="upload-icon">📤</div>
@@ -77,23 +77,23 @@ input[type="file"]{display:none}
 
 <div class="loading" id="loading">
 <div class="spinner"></div>
-<div class="loading-text">⚙️ Обработка документа...</div>
-<div class="loading-sub" id="loadingStatus">Конвертация PDF в изображение</div>
+<div class="loading-text">️ Обработка документа...</div>
+<div class="loading-sub" id="loadingStatus">Конвертация PDF</div>
 <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
 </div>
 
 <div class="data-card" id="dataCard">
 <div class="data-title">✅ Распознанные данные:</div>
 <div class="data-row"><span class="data-label">👤 Должник:</span><span class="data-value" id="dClient">-</span></div>
-<div class="data-row"><span class="data-label">📍 Адрес:</span><span class="data-value" id="dAddress">-</span></div>
+<div class="data-row"><span class="data-label"> Адрес:</span><span class="data-value" id="dAddress">-</span></div>
 <div class="data-row"><span class="data-label">🆔 ИИН:</span><span class="data-value" id="dIIN">-</span></div>
 <div class="data-row"><span class="data-label">📞 Телефон:</span><span class="data-value" id="dPhone">-</span></div>
 <div class="data-row"><span class="data-label">⚖️ Нотариус:</span><span class="data-value" id="dNotary">-</span></div>
-<div class="data-row"><span class="data-label">📅 Дата надписи:</span><span class="data-value" id="dDate">-</span></div>
+<div class="data-row"><span class="data-label"> Дата надписи:</span><span class="data-value" id="dDate">-</span></div>
 <div class="data-row"><span class="data-label">🔢 Номер:</span><span class="data-value" id="dNumber">-</span></div>
 <div class="data-row"><span class="data-label">💰 Сумма:</span><span class="data-value" id="dAmount">-</span></div>
 <div class="data-row"><span class="data-label">🏢 Взыскатель:</span><span class="data-value" id="dCreditor">-</span></div>
-<div class="data-row"><span class="data-label">📥 Дата получения:</span><span class="data-value" id="dReceive">-</span></div>
+<div class="data-row"><span class="data-label"> Дата получения:</span><span class="data-value" id="dReceive">-</span></div>
 </div>
 
 <button class="generate-btn" id="genBtn" onclick="generateDocument()">📄 Сгенерировать возражение</button>
@@ -124,7 +124,7 @@ try{
 const arrayBuffer=await file.arrayBuffer();
 const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
 const page=await pdf.getPage(1);
-const viewport=page.getViewport({scale:2});
+const viewport=page.getViewport({scale:3});
 const canvas=document.createElement('canvas');
 const ctx=canvas.getContext('2d');
 canvas.width=viewport.width;
@@ -132,7 +132,7 @@ canvas.height=viewport.height;
 await page.render({canvasContext:ctx,viewport:viewport}).promise;
 
 updateProgress(30);
-document.getElementById('loadingStatus').textContent='Распознавание текста...';
+document.getElementById('loadingStatus').textContent='Распознавание текста (OCR)...';
 
 const result=await Tesseract.recognize(canvas,'rus+eng',{
 logger:m=>{
@@ -157,67 +157,150 @@ tg.showAlert('✅ Данные распознаны! Нажмите "Сгене�
 },500);
 
 }catch(e){
-console.error(e);
+console.error('Error:',e);
 document.getElementById('loading').classList.remove('active');
-tg.showAlert('❌ Ошибка обработки. Попробуйте другой файл.');
+tg.showAlert('❌ Ошибка обработки PDF.');
 }
 }
 
 function updateProgress(p){document.getElementById('progressBar').style.width=p+'%';}
 
 function extractData(text){
-console.log('РАСПОЗНАННЫЙ ТЕКСТ:',text);
+console.log('=== РАСПОЗНАННЫЙ ТЕКСТ ===\n',text);
 
-// ФИО должника (в формате "От: ФИО")
-const fromMatch=text.match(/От:\s*([А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+)/);
-extractedData.client=fromMatch?fromMatch[1].trim():'АЛИМЖАНОВ ЕРБОЛ КАЙРАТОВИЧ';
+// Нотариус - ищем "Я, [ФИО], нотариус"
+const notaryMatch=text.match(/Я,\s*([А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+),\s*нотариус/);
+if(notaryMatch){
+extractedData.notaryName=notaryMatch[1];
+}else{
+extractedData.notaryName='';
+}
 
-// Адрес
-const addrMatch=text.match(/Адрес:\s*([^\nИИН]+)/i);
-extractedData.address=addrMatch?addrMatch[1].trim():'Жамбылская обл., Кордайский р-н, с. Енбек, ул. Агыбай дом №9';
+// Адрес нотариуса (область)
+const notaryRegionMatch=text.match(/нотариус\s+([А-ЯЁ][а-яё]+\s+обл\.?)/);
+if(notaryRegionMatch){
+extractedData.notary=notaryRegionMatch[1].trim();
+}else{
+extractedData.notary='';
+}
 
-// ИИН (12 цифр)
-const iinMatch=text.match(/(\d{12})/);
-extractedData.iin=iinMatch?iinMatch[1]:'960524301145';
+// Должник - ищем "должнику с" или "с [ФИО]"
+const clientMatch=text.match(/должнику\s+с\s+([А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+)/);
+if(clientMatch){
+extractedData.client=clientMatch[1].trim();
+}else{
+// Ищем просто ФИО заглавными буквами (3 слова)
+const clientMatch2=text.match(/([А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}\s+[А-ЯЁ]{4,})/);
+if(clientMatch2){
+extractedData.client=clientMatch2[1].trim();
+}else{
+extractedData.client='';
+}
+}
 
-// Телефон
-const phoneMatch=text.match(/(\+7\([\d]{3}\)\s*[\d]{3}-[\d]{2}-[\d]{2})/);
-extractedData.phone=phoneMatch?phoneMatch[1]:'+7(700) 700-69-00';
+// ИИН должника (12 цифр после даты рождения)
+const iinMatch=text.match(/р\.р\.?,?\s*[\d\.]+\s*,?\s*(\d{12})/);
+if(iinMatch){
+extractedData.iin=iinMatch[1];
+}else{
+// Ищем просто 12 цифр
+const iinMatch2=text.match(/(\d{12})/);
+if(iinMatch2){
+extractedData.iin=iinMatch2[1];
+}else{
+extractedData.iin='';
+}
+}
 
-// Нотариус
-const notaryMatch=text.match(/Нотариусу\s*([^\n]+(?:\n[^\n]+){0,2})/);
-extractedData.notary=notaryMatch?notaryMatch[1].replace(/\n/g,', ').trim():'Атырауской обл., г.Атырау, Атамбаева, 7/5, 6А';
+// Адрес должника - ищем после "местонахождение:" или "Адрес:"
+const addrMatch=text.match(/(?:местонахождение:|Адрес:\s*)([^,]+(?:,\s*[^,]+){2,})/);
+if(addrMatch){
+extractedData.address=addrMatch[1].trim().replace(/\s+/g,' ').replace(/,\s*/g,', ');
+}else{
+extractedData.address='';
+}
 
-// Дата надписи
-const dateMatch=text.match(/(\d{2}\.\d{2}\.\d{4})/);
-extractedData.date=dateMatch?dateMatch[1]:'18.09.2023';
+// Телефон - ищем "Тел" или "Тел.номер"
+const phoneMatch=text.match(/Тел(?:\.номер)?[:\s]*\+?7[\s(]?(\d{3})[\s)]?[\s-]?(\d{3})-?(\d{2})-?(\d{2})/);
+if(phoneMatch){
+extractedData.phone=`+7(${phoneMatch[1]}) ${phoneMatch[2]}-${phoneMatch[3]}-${phoneMatch[4]}`;
+}else{
+extractedData.phone='';
+}
 
-// Номер надписи
-const numMatch=text.match(/№\s*(\d+)/);
-extractedData.number=numMatch?numMatch[1]:'27222';
+// Дата надписи - ищем дату в формате ДД.ММ.ГГГГ или "«23» июля 2022г."
+const dateMatch=text.match(/«(\d+)»\s+([а-яё]+)\s+(\d{4})\s*г/);
+if(dateMatch){
+const day=dateMatch[1].padStart(2,'0');
+const monthName=dateMatch[2];
+const year=dateMatch[3];
+const months={'января':'01','февраля':'02','марта':'03','апреля':'04','мая':'05','июня':'06','июля':'07','августа':'08','сентября':'09','октября':'10','ноября':'11','декабря':'12'};
+const month=months[monthName]||'01';
+extractedData.date=`${day}.${month}.${year}`;
+}else{
+// Ищем просто дату ДД.ММ.ГГГГ
+const dateMatch2=text.match(/(\d{2}\.\d{2}\.\d{4})/);
+if(dateMatch2){
+extractedData.date=dateMatch2[1];
+}else{
+extractedData.date='';
+}
+}
 
-// Сумма
-const amountMatch=text.match(/(\d[\d\s]{5,})\s*тенге/i);
-extractedData.amount=amountMatch?amountMatch[1].trim()+' тенге':'2 644 769 тенге';
+// Номер надписи - ищем "за №" или "№"
+const numberMatch=text.match(/(?:за\s+)?№\s*(\d+)/);
+if(numberMatch){
+extractedData.number=numberMatch[1];
+}else{
+extractedData.number='';
+}
 
-// Взыскатель
-const credMatch=text.match(/в пользу\s*([^\n]+)/i);
-extractedData.creditor=credMatch?credMatch[1].trim():'ТОО «КА ID Collect»';
+// Сумма - ищем число перед "тенге" (с пробелами)
+const amountMatch=text.match(/(\d[\d\s]{5,})\s*тенге/);
+if(amountMatch){
+extractedData.amount=amountMatch[1].trim()+' тенге';
+}else{
+extractedData.amount='';
+}
 
-// Дата получения
-const recvMatch=text.match(/получена? мной\s*(\d{2}\.\d{2}\.\d{4})/i);
-extractedData.receive=recvMatch?recvMatch[1]:'15.07.2026';
+// Взыскатель - ищем "в пользу" до "БИН" или "местонахождение"
+const creditorMatch=text.match(/в пользу\s+([^\n]+(?:\n[^\n]+){0,2})/);
+if(creditorMatch){
+extractedData.creditor=creditorMatch[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ');
+}else{
+extractedData.creditor='';
+}
 
-document.getElementById('dClient').textContent=extractedData.client;
-document.getElementById('dAddress').textContent=extractedData.address;
-document.getElementById('dIIN').textContent=extractedData.iin;
-document.getElementById('dPhone').textContent=extractedData.phone;
-document.getElementById('dNotary').textContent=extractedData.notary;
-document.getElementById('dDate').textContent=extractedData.date;
-document.getElementById('dNumber').textContent='№ '+extractedData.number;
-document.getElementById('dAmount').textContent=extractedData.amount;
-document.getElementById('dCreditor').textContent=extractedData.creditor;
-document.getElementById('dReceive').textContent=extractedData.receive;
+// Дата получения - если есть в тексте
+const receiveMatch=text.match(/Дата получения.*?(\d{2}\.\d{2}\.\d{4})/);
+if(receiveMatch){
+extractedData.receive=receiveMatch[1];
+}else{
+// Или "«23» июля 2022г."
+const receiveMatch2=text.match(/(\d{2})[)\s]+([а-яё]+)\s+(\d{4})\s*г/);
+if(receiveMatch2){
+const day=receiveMatch2[1];
+const monthName=receiveMatch2[2];
+const year=receiveMatch2[3];
+const months={'января':'01','февраля':'02','марта':'03','апреля':'04','мая':'05','июня':'06','июля':'07','августа':'08','сентября':'09','октября':'10','ноября':'11','декабря':'12'};
+const month=months[monthName]||'07';
+extractedData.receive=`${day}.${month}.${year}`;
+}else{
+extractedData.receive='';
+}
+}
+
+// Показываем данные
+document.getElementById('dClient').textContent=extractedData.client||'не распознано';
+document.getElementById('dAddress').textContent=extractedData.address||'не распознано';
+document.getElementById('dIIN').textContent=extractedData.iin||'не распознано';
+document.getElementById('dPhone').textContent=extractedData.phone||'не распознано';
+document.getElementById('dNotary').textContent=(extractedData.notary+' '+extractedData.notaryName).trim()||'не распознано';
+document.getElementById('dDate').textContent=extractedData.date||'не распознано';
+document.getElementById('dNumber').textContent=extractedData.number?'№ '+extractedData.number:'не распознано';
+document.getElementById('dAmount').textContent=extractedData.amount||'не распознано';
+document.getElementById('dCreditor').textContent=extractedData.creditor||'не распознано';
+document.getElementById('dReceive').textContent=extractedData.receive||'не распознано';
 }
 
 function generateDocument(){
@@ -225,7 +308,7 @@ const c=extractedData.client;
 const a=extractedData.address;
 const iin=extractedData.iin;
 const ph=extractedData.phone;
-const n=extractedData.notary;
+const n=(extractedData.notary+' '+extractedData.notaryName).trim();
 const d=extractedData.date;
 const num=extractedData.number;
 const amt=extractedData.amount;
@@ -242,7 +325,7 @@ const text=`Нотариусу ${n}
 
 ВОЗРАЖЕНИЕ
 
-Вами ${d} года была вынесена исполнительная надпись за № ${num} о взыскании с ${c} в пользу ${cr} сумму задолженности в ${amt}.
+Вами ${d} года была вынесена исполнительная надпись за № ${num} о взыскания с ${c} в пользу ${cr} сумму задолженности в ${amt}.
 
 С данной исполнительной надписью я не согласен, я не согласен с суммой, которую взыскатель просит взыскать.
 Мне не удалось связаться с взыскателем, на мои звонки взыскатель не отвечает.
@@ -264,7 +347,7 @@ const text=`Нотариусу ${n}
 
 ПРОШУ:
 
-Исполнительная надпись от ${d} года за № ${num} о взыскании с ${c} в пользу ${cr} задолженности в размере ${amt} — отменить.
+Исполнительная надпись от ${d} года за № ${num} о взыскания с ${c} в пользу ${cr} задолженности в размере ${amt} — отменить.
 
 Заявитель: ${initials}.
 
