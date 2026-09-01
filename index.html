@@ -3,348 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AREST OF - Авто-генератор возражений</title>
+<title>AREST OF - Генератор возражений</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0e1a;color:#fff;padding-bottom:100px}
-.header{background:linear-gradient(135deg,#1a1f2e 0%,#0f1419 100%);padding:20px 16px;position:sticky;top:0;z-index:100;border-bottom:2px solid #dc2626}
-.logo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+body{font-family:-apple-system,sans-serif;background:#0a0e1a;color:#fff;padding-bottom:100px}
+.header{background:linear-gradient(135deg,#1a1f2e,#0f1419);padding:20px 16px;border-bottom:2px solid #dc2626;position:sticky;top:0}
+.logo{display:flex;align-items:center;gap:12px}
 .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px}
 .logo-text{font-size:26px;font-weight:800;color:#fff}
 .logo-text span{color:#dc2626}
-.lang-switch{display:flex;gap:8px}
-.lang-btn{padding:8px 14px;border-radius:10px;border:1px solid #374151;background:#1f2937;color:#9ca3af;font-size:13px;font-weight:700;cursor:pointer}
-.lang-btn.active{background:#dc2626;border-color:#dc2626;color:#fff}
-.welcome{background:linear-gradient(135deg,#1f2937,#111827);margin:16px;padding:20px;border-radius:16px;border:1px solid #374151}
-.welcome-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:6px}
-.welcome-sub{font-size:13px;color:#9ca3af}
-.section-title{font-size:13px;color:#9ca3af;margin:0 16px 12px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
-.service-card{background:linear-gradient(135deg,#1f2937 0%,#111827 100%);margin:0 16px 12px;padding:18px;border-radius:14px;display:flex;align-items:center;gap:14px;border:1px solid #374151;cursor:pointer;transition:all .3s}
-.service-card:active{transform:scale(.98);border-color:#dc2626}
-.service-icon{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
-.service-icon.red{background:linear-gradient(135deg,#dc2626,#991b1b)}
-.service-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
-.service-sub{font-size:12px;color:#9ca3af}
-.service-arrow{margin-left:auto;font-size:22px;color:#6b7280}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(0deg,#111827,#1f2937);display:flex;justify-content:space-around;padding:10px 0 calc(10px + env(safe-area-inset-bottom));border-top:1px solid #374151;z-index:100}
-.nav-item{flex:1;text-align:center;color:#6b7280;font-size:11px;font-weight:600;cursor:pointer}
-.nav-item.active{color:#dc2626}
-.nav-icon{font-size:22px;margin-bottom:2px}
-.page{display:none}
-.page.active{display:block}
-.back-btn{background:#1f2937;border:1px solid #374151;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin:16px;display:flex;align-items:center;gap:8px}
-.form-container{margin:0 16px;padding:20px;background:linear-gradient(135deg,#1f2937,#111827);border-radius:16px;border:1px solid #374151}
-.form-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:6px}
-.form-subtitle{font-size:13px;color:#9ca3af;margin-bottom:20px}
-.upload-zone{border:3px dashed #374151;border-radius:16px;padding:32px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(31,41,55,0.5);margin-bottom:20px}
-.upload-zone:hover,.upload-zone.dragover{border-color:#dc2626;background:rgba(220,38,38,0.1)}
-.upload-zone input{display:none}
-.upload-icon{font-size:56px;margin-bottom:12px}
-.upload-text{font-size:15px;color:#fff;font-weight:700;margin-bottom:6px}
-.upload-hint{font-size:12px;color:#6b7280}
-.file-name{margin-top:12px;padding:10px;background:rgba(16,185,129,0.1);border-radius:8px;font-size:13px;color:#10b981;font-weight:600}
-.preview-container{margin:16px 0;border-radius:12px;overflow:hidden;border:1px solid #374151;max-height:350px;overflow-y:auto}
-.preview-container img{width:100%;display:block}
-.loading{display:none;text-align:center;padding:24px;background:rgba(31,41,55,0.8);border-radius:12px;margin:16px 0}
-.loading.active{display:block}
-.spinner{width:50px;height:50px;border:4px solid #374151;border-top-color:#dc2626;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{color:#e5e7eb;font-size:14px;font-weight:600;margin-bottom:8px}
-.loading-sub{color:#6b7280;font-size:12px}
-.progress-bar{width:100%;height:6px;background:#374151;border-radius:3px;overflow:hidden;margin-top:12px}
-.progress-fill{height:100%;background:linear-gradient(90deg,#dc2626,#991b1b);transition:width .3s;width:0%}
-.extracted-data{background:#0a0e1a;border:1px solid #374151;border-radius:12px;padding:16px;margin:16px 0;display:none}
-.extracted-data.active{display:block}
-.data-title{font-size:13px;color:#9ca3af;margin-bottom:12px;font-weight:600}
-.data-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1f2937;flex-wrap:wrap}
-.data-item:last-child{border-bottom:none}
-.data-label{color:#6b7280;font-size:13px;flex:1;min-width:120px}
-.data-value{color:#10b981;font-size:13px;font-weight:600;flex:2;text-align:right}
-.data-value.editable{color:#fbbf24;cursor:pointer}
-.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;display:none}
-.submit-btn.active{display:block}
-.result-container{margin:16px;padding:16px;background:#fff;color:#000;border-radius:8px;display:none;font-family:'Times New Roman',Times,serif;font-size:12px;line-height:1.6}
-.result-container.active{display:block}
-.result-title{font-size:16px;font-weight:800;color:#dc2626;margin-bottom:16px;text-align:center;text-transform:uppercase}
+.back-btn{background:#1f2937;border:1px solid #374151;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;margin:16px;cursor:pointer;display:inline-block}
+.container{margin:0 16px 20px}
+.title{font-size:20px;font-weight:800;color:#fff;margin:20px 0 8px}
+.subtitle{font-size:13px;color:#9ca3af;margin-bottom:20px}
+.upload-zone{border:2px dashed #374151;border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;background:rgba(31,41,55,0.5)}
+.upload-zone input[type="file"]{display:none}
+.file-label{display:block;padding:12px;background:#dc2626;border-radius:10px;color:#fff;font-weight:700;cursor:pointer}
+.file-name{margin-top:10px;color:#10b981;font-size:13px}
+.form-group{margin-bottom:16px}
+.label{display:block;font-size:13px;color:#9ca3af;margin-bottom:8px;font-weight:600}
+.input{width:100%;padding:12px;background:#0a0e1a;border:1px solid #374151;border-radius:10px;color:#fff;font-size:14px}
+.input:focus{outline:none;border-color:#dc2626}
+.generate-btn{width:100%;padding:14px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:20px}
+.result{display:none;margin:20px 0;padding:20px;background:#fff;color:#000;border-radius:8px;font-family:'Times New Roman',serif;font-size:11px;line-height:1.5}
+.result.active{display:block}
+.result-title{font-size:16px;font-weight:800;color:#dc2626;text-align:center;text-transform:uppercase;margin-bottom:16px}
 .result-text{white-space:pre-wrap;margin-bottom:16px}
-.download-btn{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
-.edit-btn{width:100%;padding:12px;background:#374151;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.download-btn{width:100%;padding:14px;background:#10b981;border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
 
-<div id="homePage" class="page active">
 <div class="header">
 <div class="logo">
 <div class="logo-icon">⚖️</div>
 <div class="logo-text">AREST<span>OF</span></div>
 </div>
-<div class="lang-switch">
-<button class="lang-btn active">РУС</button>
-<button class="lang-btn">ҚАЗ</button>
-</div>
-</div>
-<div class="welcome">
-<div class="welcome-title">🤖 AI Распознавание</div>
-<div class="welcome-sub">Загрузите исполнительную надпись — система сама создаст возражение</div>
-</div>
-<div class="section-title">📋 Услуги</div>
-<div class="service-card" onclick="showPage('arrestsPage')">
-<div class="service-icon red">🔒</div>
-<div><div class="service-title">Аресты</div><div class="service-sub">Авто-генерация возражения</div></div>
-<div class="service-arrow">›</div>
-</div>
-<div class="bottom-nav">
-<div class="nav-item active"><div class="nav-icon"></div>Шаблоны</div>
-<div class="nav-item"><div class="nav-icon">☑️</div>Чек-лист</div>
-<div class="nav-item"><div class="nav-icon">🎓</div>Курсы</div>
-<div class="nav-item"><div class="nav-icon">👤</div>Профиль</div>
-</div>
 </div>
 
-<div id="arrestsPage" class="page">
-<div class="header">
-<div class="logo">
-<div class="logo-icon">🔒</div>
-<div class="logo-text">AREST<span>OF</span></div>
-</div>
-</div>
-<button class="back-btn" onclick="showPage('homePage')">← Назад</button>
-<div class="form-container">
-<div class="form-title"> Возражение на исп. надпись</div>
-<div class="form-subtitle">Загрузите фото или PDF исполнительной надписи</div>
+<button class="back-btn" onclick="history.back()">← Назад</button>
 
-<div class="upload-zone" onclick="document.getElementById('arrestFile').click()">
-<div class="upload-icon"></div>
-<div class="upload-text">Нажмите для загрузки</div>
-<div class="upload-hint">PDF, JPG, PNG до 10 МБ</div>
-<input type="file" id="arrestFile" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileUpload(this)">
-</div>
+<div class="container">
+<div class="title">🔒 Возражение на исп. надпись</div>
+<div class="subtitle">Загрузите PDF или заполните форму вручную</div>
 
+<div class="upload-zone">
+<label class="file-label" onclick="document.getElementById('pdfFile').click()">
+📤 Загрузить PDF с исп. надписью
+</label>
+<input type="file" id="pdfFile" accept=".pdf" onchange="handlePDFUpload(this)">
 <div class="file-name" id="fileName"></div>
-<div class="preview-container" id="previewContainer"></div>
-
-<div class="loading" id="loading">
-<div class="spinner"></div>
-<div class="loading-text"> Распознавание документа...</div>
-<div class="loading-sub" id="loadingStatus">Загрузка OCR движка</div>
-<div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
 </div>
 
-<div class="extracted-data" id="extractedData">
-<div class="data-title">📊 Распознанные данные (нажмите для редактирования):</div>
-<div class="data-item"><span class="data-label">👤 Должник:</span><span class="data-value editable" id="dataClient" onclick="editField('dataClient')">-</span></div>
-<div class="data-item"><span class="data-label">📍 Адрес:</span><span class="data-value editable" id="dataAddress" onclick="editField('dataAddress')">-</span></div>
-<div class="data-item"><span class="data-label">🆔 ИИН:</span><span class="data-value editable" id="dataIIN" onclick="editField('dataIIN')">-</span></div>
-<div class="data-item"><span class="data-label">📞 Телефон:</span><span class="data-value editable" id="dataPhone" onclick="editField('dataPhone')">-</span></div>
-<div class="data-item"><span class="data-label">⚖️ Нотариус:</span><span class="data-value editable" id="dataNotary" onclick="editField('dataNotary')">-</span></div>
-<div class="data-item"><span class="data-label">📅 Дата надписи:</span><span class="data-value editable" id="dataDate" onclick="editField('dataDate')">-</span></div>
-<div class="data-item"><span class="data-label">🔢 Номер:</span><span class="data-value editable" id="dataNumber" onclick="editField('dataNumber')">-</span></div>
-<div class="data-item"><span class="data-label">💰 Сумма:</span><span class="data-value editable" id="dataAmount" onclick="editField('dataAmount')">-</span></div>
-<div class="data-item"><span class="data-label">🏢 Взыскатель:</span><span class="data-value editable" id="dataCreditor" onclick="editField('dataCreditor')">-</span></div>
-<div class="data-item"><span class="data-label">📥 Дата получения:</span><span class="data-value editable" id="dataReceive" onclick="editField('dataReceive')">-</span></div>
+<div class="form-group">
+<label class="label"> ФИО должника</label>
+<input type="text" class="input" id="clientName" placeholder="АЛИМЖАНОВ ЕРБОЛ КАЙРАТОВИЧ">
 </div>
 
-<button class="submit-btn" id="generateBtn" onclick="generateDocument()">📄 Сгенерировать возражение</button>
+<div class="form-group">
+<label class="label">📍 Адрес</label>
+<input type="text" class="input" id="clientAddress" placeholder="Жамбылская обл., Кордайский р-н, с. Енбек, ул. Агыбай дом №9">
+</div>
 
-<div class="result-container" id="resultContainer">
+<div class="form-group">
+<label class="label">🆔 ИИН</label>
+<input type="text" class="input" id="clientIIN" placeholder="960524301145">
+</div>
+
+<div class="form-group">
+<label class="label">📞 Телефон</label>
+<input type="text" class="input" id="clientPhone" placeholder="+7(700) 700-69-00">
+</div>
+
+<div class="form-group">
+<label class="label">⚖️ Нотариус (адрес)</label>
+<input type="text" class="input" id="notaryAddress" placeholder="Атырауской обл., г.Атырау, Атамбаева, 7/5, 6А">
+</div>
+
+<div class="form-group">
+<label class="label">👤 ФИО нотариуса</label>
+<input type="text" class="input" id="notaryName" placeholder="САРСЕНОВА БАГДАТ НУРИБАЕВНА">
+</div>
+
+<div class="form-group">
+<label class="label">📅 Дата вынесения исп. надписи</label>
+<input type="date" class="input" id="endorsementDate">
+</div>
+
+<div class="form-group">
+<label class="label">🔢 Номер исп. надписи</label>
+<input type="text" class="input" id="endorsementNumber" placeholder="27222">
+</div>
+
+<div class="form-group">
+<label class="label">🏢 Взыскатель</label>
+<input type="text" class="input" id="creditor" placeholder="ТОО «КА ID Collect»">
+</div>
+
+<div class="form-group">
+<label class="label">💰 Сумма (тенге)</label>
+<input type="text" class="input" id="debtAmount" placeholder="2 644 769">
+</div>
+
+<div class="form-group">
+<label class="label">📥 Дата получения</label>
+<input type="date" class="input" id="receiveDate">
+</div>
+
+<button class="generate-btn" onclick="generateDocument()">📄 Сгенерировать возражение</button>
+
+<div class="result" id="result">
 <div class="result-title">✅ Готовое возражение</div>
 <div class="result-text" id="resultText"></div>
-<button class="download-btn" onclick="downloadPDF()"> Скачать PDF</button>
-<button class="edit-btn" onclick="editDocument()">✏️ Редактировать данные</button>
-</div>
+<button class="download-btn" onclick="downloadPDF()">📥 Скачать PDF</button>
 </div>
 </div>
 
 <script>
 const tg=window.Telegram.WebApp;
 tg.ready();
-tg.expand();
 
-let extractedData={};
-let uploadedFile=null;
-
-function showPage(pageId){
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-document.getElementById(pageId).classList.add('active');
-window.scrollTo(0,0);
-}
-
-async function handleFileUpload(input){
-if(!input.files||!input.files[0])return;
-
-uploadedFile=input.files[0];
-document.getElementById('fileName').textContent='✅ '+uploadedFile.name;
-
-const reader=new FileReader();
-reader.onload=function(e){
-const container=document.getElementById('previewContainer');
-if(uploadedFile.type.includes('pdf')){
-container.innerHTML='<iframe src="'+e.target.result+'" style="width:100%;height:300px;border:none"></iframe>';
-}else{
-container.innerHTML='<img src="'+e.target.result+'" alt="Preview">';
-}
-};
-reader.readAsDataURL(uploadedFile);
-
-await performOCR();
-}
-
-async function performOCR(){
-document.getElementById('loading').classList.add('active');
-updateProgress(5);
-document.getElementById('loadingStatus').textContent='Загрузка OCR движка...';
-
-try{
-const result=await Tesseract.recognize(
-uploadedFile,
-'rus+eng',
-{
-logger:m=>{
-if(m.status==='recognizing text'){
-updateProgress(30+Math.floor(m.progress*50));
-document.getElementById('loadingStatus').textContent='Распознавание текста... '+Math.floor(m.progress*100)+'%';
-}else if(m.status==='loading language traineddata'){
-document.getElementById('loadingStatus').textContent='Загрузка языкового пакета...';
-}
-}
-}
-);
-
-updateProgress(90);
-document.getElementById('loadingStatus').textContent='Анализ данных...';
-
-extractData(result.data.text);
-
-updateProgress(100);
-
-setTimeout(()=>{
-document.getElementById('loading').classList.remove('active');
-document.getElementById('extractedData').classList.add('active');
-document.getElementById('generateBtn').classList.add('active');
-tg.showAlert('✅ Документ распознан! Проверьте данные и нажмите "Сгенерировать"');
-},500);
-
-}catch(error){
-console.error('OCR Error:',error);
-document.getElementById('loading').classList.remove('active');
-tg.showAlert('❌ Ошибка распознавания. Попробуйте другой файл.');
-}
-}
-
-function updateProgress(percent){
-document.getElementById('progressBar').style.width=percent+'%';
-}
-
-function extractData(text){
-console.log('Распознанный текст:',text);
-
-// ФИО должника (3 слова заглавными буквами)
-const nameMatch=text.match(/([А-ЯЁ]{2,}[а-яё]*\s+[А-ЯЁ]{2,}[а-яё]*\s+[А-ЯЁ]{2,}[а-яё]*)/);
-extractedData.client=nameMatch?nameMatch[1].trim():'АЛИМЖАНОВ ЕРБОЛ КАЙРАТОВИЧ';
-
-// Адрес
-const addressMatch=text.match(/(?:адрес|Address|мекенжай)[:\s]*([^\n]+)/i);
-extractedData.address=addressMatch?addressMatch[1].trim():'Жамбылская обл., Кордайский р-н, с. Енбек, ул. Агыбай, д. 9';
-
-// ИИН (12 цифр)
-const iinMatch=text.match(/(\d{12})/);
-extractedData.iin=iinMatch?iinMatch[1]:'960524301145';
-
-// Телефон
-const phoneMatch=text.match(/(\+?\d[\d\s\-\(\)]{9,})/);
-extractedData.phone=phoneMatch?phoneMatch[1].trim():'+7(700) 700-69-00';
-
-// Нотариус
-const notaryMatch=text.match(/нотариус[а-я]*[:\s]*([^\n]+)/i);
-extractedData.notary=notaryMatch?notaryMatch[1].trim():'Атырауской обл., г.Атырау, Атамбаева, 7/5, 6А';
-
-// Дата (формат ДД.ММ.ГГГГ)
-const dateMatch=text.match(/(\d{2}\.\d{2}\.\d{4})/);
-extractedData.date=dateMatch?dateMatch[1]:'18.09.2023';
-
-// Номер надписи
-const numberMatch=text.match(/№\s*(\d+)/);
-extractedData.number=numberMatch?numberMatch[1]:'27222';
-
-// Сумма (число с пробелами)
-const amountMatch=text.match(/(\d[\d\s]{5,})\s*тенге/i);
-extractedData.amount=amountMatch?amountMatch[1].trim()+' тенге':'2 644 769 тенге';
-
-// Взыскатель
-const creditorMatch=text.match(/в пользу\s+([^\n]+)/i);
-extractedData.creditor=creditorMatch?creditorMatch[1].trim():'ТОО «КА ID Collect»';
-
-// Дата получения
-const receiveMatch=text.match(/получен[а-я]*\s+(\d{2}\.\d{2}\.\d{4})/i);
-extractedData.receive=receiveMatch?receiveMatch[1]:'15.07.2026';
-
-// Отображаем данные
-document.getElementById('dataClient').textContent=extractedData.client;
-document.getElementById('dataAddress').textContent=extractedData.address;
-document.getElementById('dataIIN').textContent=extractedData.iin;
-document.getElementById('dataPhone').textContent=extractedData.phone;
-document.getElementById('dataNotary').textContent=extractedData.notary;
-document.getElementById('dataDate').textContent=extractedData.date;
-document.getElementById('dataNumber').textContent='№ '+extractedData.number;
-document.getElementById('dataAmount').textContent=extractedData.amount;
-document.getElementById('dataCreditor').textContent=extractedData.creditor;
-document.getElementById('dataReceive').textContent=extractedData.receive;
-}
-
-function editField(fieldId){
-const element=document.getElementById(fieldId);
-const currentValue=element.textContent;
-const newValue=prompt('Редактировать:',currentValue);
-if(newValue!==null&&newValue.trim()!==''){
-element.textContent=newValue.trim();
-// Обновляем данные
-const fieldMap={
-'dataClient':'client','dataAddress':'address','dataIIN':'iin',
-'dataPhone':'phone','dataNotary':'notary','dataDate':'date',
-'dataNumber':'number','dataAmount':'amount','dataCreditor':'creditor','dataReceive':'receive'
-};
-if(fieldMap[fieldId]){
-extractedData[fieldMap[fieldId]]=newValue.trim();
-}
-}
+function handlePDFUpload(input){
+if(!input.files[0])return;
+document.getElementById('fileName').textContent='✅ '+input.files[0].name;
+// Просто подтверждаем загрузку - данные можно ввести вручную
+tg.showAlert(' Файл загружен! Теперь заполните поля выше данными из этого документа.');
 }
 
 function generateDocument(){
-// Берем данные из отображаемых элементов (с учетом редактирования)
-const client=document.getElementById('dataClient').textContent;
-const address=document.getElementById('dataAddress').textContent;
-const iin=document.getElementById('dataIIN').textContent;
-const phone=document.getElementById('dataPhone').textContent;
-const notary=document.getElementById('dataNotary').textContent;
-const date=document.getElementById('dataDate').textContent;
-const number=document.getElementById('dataNumber').textContent.replace('№ ','');
-const amount=document.getElementById('dataAmount').textContent;
-const creditor=document.getElementById('dataCreditor').textContent;
-const receive=document.getElementById('dataReceive').textContent;
+const clientName=document.getElementById('clientName').value;
+const clientAddress=document.getElementById('clientAddress').value;
+const clientIIN=document.getElementById('clientIIN').value;
+const clientPhone=document.getElementById('clientPhone').value;
+const notaryAddress=document.getElementById('notaryAddress').value;
+const notaryName=document.getElementById('notaryName').value;
+const endorsementDate=formatDate(document.getElementById('endorsementDate').value);
+const endorsementNumber=document.getElementById('endorsementNumber').value;
+const creditor=document.getElementById('creditor').value;
+const debtAmount=document.getElementById('debtAmount').value;
+const receiveDate=formatDate(document.getElementById('receiveDate').value);
 
-const clientInitials=client.split(' ').map(n=>n[0]).join('. ');
+if(!clientName||!endorsementDate||!endorsementNumber||!debtAmount){
+alert('⚠️ Заполните обязательные поля!');
+return;
+}
 
-const text=`Нотариусу ${notary}
+const clientInitials=clientName.split(' ').map(n=>n.charAt(0)).join('. ');
 
-От: ${client}
-Адрес: ${address}
-ИИН: ${iin}
-Тел: ${phone}
+const text=`Нотариусу ${notaryAddress}
+${notaryName}
+
+От: ${clientName}
+Адрес: ${clientAddress}
+ИИН: ${clientIIN}
+Тел: ${clientPhone}
 
 ВОЗРАЖЕНИЕ
 
-Вами ${date} года была вынесена исполнительная надпись за № ${number} о взыскании с ${client} в пользу ${creditor} сумму задолженности в ${amount}.
+Вами ${endorsementDate} года была вынесена исполнительная надпись за № ${endorsementNumber} о взыскании с ${clientName} в пользу ${creditor} сумму задолженности в ${debtAmount} тенге.
 
 С данной исполнительной надписью я не согласен, я не согласен с суммой, которую взыскатель просит взыскать.
 Мне не удалось связаться с взыскателем, на мои звонки взыскатель не отвечает.
 
 Исходя из этого из за того что между взыскателем и мной имеются разногласия по поводу суммы, взыскателю следует обратиться в суд для рассмотрения в судебном порядке, в порядке ГПК РК.
 
-Ваша исполнительная надпись была получена мной ${receive} года.
+Ваша исполнительная надпись была получена мной ${receiveDate} года.
 
 В пункте 1 ч 1 ст 92-2 закона «О нотариате» указано:
 Исполнительная надпись совершается, если представленные документы подтверждают бесспорность задолженности или иной ответственности должника перед взыскателем.
@@ -359,35 +184,36 @@ const text=`Нотариусу ${notary}
 
 ПРОШУ:
 
-Исполнительная надпись от ${date} года за № ${number} о взыскании с ${client} в пользу ${creditor} задолженности в размере ${amount} — отменить.
+Исполнительная надпись от ${endorsementDate} года за № ${endorsementNumber} о взыскании с ${clientName} в пользу ${creditor} задолженности в размере ${debtAmount} тенге — отменить.
 
 Заявитель: ${clientInitials}.
 
-${receive} г.`;
+${receiveDate} г.`;
 
 document.getElementById('resultText').textContent=text;
-document.getElementById('resultContainer').classList.add('active');
-document.getElementById('generateBtn').classList.remove('active');
+document.getElementById('result').classList.add('active');
 window.scrollTo(0,document.body.scrollHeight);
 }
 
-function downloadPDF(){
-const text=document.getElementById('resultText').textContent;
-const{jsPDF}=window.jspdf;
-const doc=new jsPDF();
-doc.setFont('times');
-doc.setFontSize(11);
-const splitText=doc.splitTextToSize(text,170);
-doc.text(splitText,20,15);
-const client=document.getElementById('dataClient').textContent.split(' ')[0]||'document';
-doc.save(`Vozrazhenie_${client}.pdf`);
+function formatDate(dateStr){
+if(!dateStr)return '___';
+const date=new Date(dateStr);
+const day=String(date.getDate()).padStart(2,'0');
+const month=String(date.getMonth()+1).padStart(2,'0');
+const year=date.getFullYear();
+return `${day}.${month}.${year}`;
 }
 
-function editDocument(){
-document.getElementById('resultContainer').classList.remove('active');
-document.getElementById('generateBtn').classList.add('active');
-document.getElementById('extractedData').scrollIntoView({behavior:'smooth'});
+function downloadPDF(){
+const{jsPDF}=window.jspdf;
+const doc=new jsPDF();
+const text=document.getElementById('resultText').textContent;
+doc.setFont('times');
+doc.setFontSize(10);
+const split=doc.splitTextToSize(text,170);
+doc.text(split,20,15);
+doc.save('Vozrazhenie.pdf');
 }
 </script>
 </body>
-  </html>
+</html>
