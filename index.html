@@ -3,83 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Шаблоны</title>
+<title>AREST OF - Юридические решения</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,sans-serif;background:var(--tg-theme-bg-color,#f5f5f5);color:var(--tg-theme-text-color,#000);padding-bottom:80px}
-.header{background:var(--tg-theme-bg-color,#fff);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
-.header-title{font-size:24px;font-weight:700}
-.lang-btn{padding:6px 12px;border-radius:8px;border:none;background:var(--tg-theme-secondary-bg-color,#f0f0f0);font-size:14px;margin-left:8px}
-.sub-block{background:linear-gradient(135deg,#2c3e50,#34495e);margin:16px;padding:20px;border-radius:16px;color:#fff}
-.sub-label{font-size:12px;opacity:.8;text-transform:uppercase}
-.sub-status{font-size:24px;font-weight:700;margin:8px 0 16px}
-.sub-btn{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:16px;font-weight:600}
-.balance{margin-top:12px;font-size:14px;opacity:.8}
-.my-doc{background:var(--tg-theme-bg-color,#fff);margin:16px;padding:16px;border-radius:12px;font-size:16px;font-weight:500}
-.section-title{padding:16px;font-size:14px;color:#999}
-.card{background:var(--tg-theme-bg-color,#fff);margin:0 16px 12px;padding:16px;border-radius:16px;display:flex;align-items:center;gap:12px}
-.icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px}
-.title{font-size:16px;font-weight:600}
-.sub{font-size:13px;color:#999;margin-top:4px}
-.arrow{margin-left:auto;font-size:20px;color:#ccc}
-.nav{position:fixed;bottom:0;left:0;right:0;background:var(--tg-theme-bg-color,#fff);display:flex;justify-content:space-around;padding:8px 0}
-.nav-item{text-align:center;font-size:11px;color:#999}
-.nav-item.active{color:#3390ec}
-.nav-icon{font-size:24px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0e1a;color:#fff;padding-bottom:100px}
+.header{background:linear-gradient(135deg,#1a1f2e 0%,#0f1419 100%);padding:20px 16px;position:sticky;top:0;z-index:100;border-bottom:2px solid #dc2626}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.logo-text{font-size:24px;font-weight:800;color:#fff}
+.logo-text span{color:#dc2626}
+.lang-switch{display:flex;gap:8px}
+.lang-btn{padding:6px 12px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer}
+.lang-btn.active{background:#dc2626;border-color:#dc2626;color:#fff}
+.hero{background:linear-gradient(135deg,#dc2626 0%,#991b1b 100%);margin:16px;padding:24px;border-radius:16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%)}
+.hero-label{text-transform:uppercase;font-size:11px;color:#fecaca;letter-spacing:2px;margin-bottom:8px;font-weight:700}
+.hero-title{font-size:28px;font-weight:800;color:#fff;margin-bottom:16px}
+.hero-btn{width:100%;padding:14px;border:none;border-radius:10px;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);color:#fff;font-size:15px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.3)}
+.balance{margin-top:12px;font-size:13px;color:#fecaca}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px}
+.stat-card{background:linear-gradient(135deg,#1f2937,#111827);padding:16px;border-radius:12px;border:1px solid #374151}
+.stat-value{font-size:24px;font-weight:800;color:#dc2626;margin-bottom:4px}
+.stat-label{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px}
+.section-title{font-size:13px;color:#9ca3af;margin:20px 16px 12px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.service-card{background:linear-gradient(135deg,#1f2937 0%,#111827 100%);margin:0 16px 12px;padding:18px;border-radius:14px;display:flex;align-items:center;gap:14px;border:1px solid #374151;cursor:pointer;transition:all .3s}
+.service-card:active{transform:scale(.98);border-color:#dc2626}
+.service-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.service-icon.red{background:linear-gradient(135deg,#dc2626,#991b1b)}
+.service-icon.orange{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.service-icon.blue{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+.service-icon.green{background:linear-gradient(135deg,#10b981,#059669)}
+.service-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+.service-sub{font-size:12px;color:#9ca3af}
+.service-arrow{margin-left:auto;font-size:20px;color:#6b7280}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(0deg,#111827,#1f2937);display:flex;justify-content:space-around;padding:10px 0 calc(10px + env(safe-area-inset-bottom));border-top:1px solid #374151;z-index:100}
+.nav-item{flex:1;text-align:center;color:#6b7280;font-size:10px;font-weight:600;cursor:pointer}
+.nav-item.active{color:#dc2626}
+.nav-icon{font-size:20px;margin-bottom:2px}
 </style>
 </head>
 <body>
 <div class="header">
-<div class="header-title">Шаблоны</div>
+<div class="logo">
+<div class="logo-icon">⚖️</div>
+<div class="logo-text">AREST<span>OF</span></div>
+</div>
+<div class="lang-switch">
+<button class="lang-btn active">РУС</button>
+<button class="lang-btn">ҚАЗ</button>
+</div>
+</div>
+<div class="hero">
+<div class="hero-label">🔥 Подписка</div>
+<div class="hero-title">Не активна</div>
+<button class="hero-btn"> Оформить подписку →</button>
+<div class="balance">💰 Баланс: 0.00 ₸ · пополнить</div>
+</div>
+<div class="stats">
+<div class="stat-card">
+<div class="stat-value">1,248</div>
+<div class="stat-label">Всего заявок</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">342</div>
+<div class="stat-label">В работе</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">756</div>
+<div class="stat-label">Выполнено</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">150</div>
+<div class="stat-label">Новых</div>
+</div>
+</div>
+<div class="section-title">📋 Услуги</div>
+<div class="service-card">
+<div class="service-icon red">🔒</div>
 <div>
-<button class="lang-btn">🇺 РУС</button>
-<button class="lang-btn">🇰🇿 ҚАЗ</button>
+<div class="service-title">Аресты</div>
+<div class="service-sub">Возражение нотариусу | суд аресты</div>
 </div>
+<div class="service-arrow">›</div>
 </div>
-<div class="sub-block">
-<div class="sub-label">ПОДПИСКА</div>
-<div class="sub-status">Не активна</div>
-<button class="sub-btn">🚀 Оформить подписку →</button>
-<div class="balance">Баланс: 0.00 ₸ · пополнить</div>
-</div>
-<div class="my-doc">📁 Мои документы</div>
-<div class="section-title">Выберите тип услуги 📋</div>
-<div class="card">
-<div class="icon" style="background:#fff3e0">🔒</div>
+<div class="service-card">
+<div class="service-icon orange"></div>
 <div>
-<div class="title">Аресты - заполнить шаблон</div>
-<div class="sub">Возражение нотариусу | суд аресты</div>
+<div class="service-title">МФО</div>
+<div class="service-sub">Новый график платежей</div>
 </div>
-<div class="arrow">›</div>
+<div class="service-arrow">›</div>
 </div>
-<div class="card">
-<div class="icon" style="background:#ffebee">📅</div>
+<div class="service-card">
+<div class="service-icon blue">🏦</div>
 <div>
-<div class="title">МФО - заполнить шаблон</div>
-<div class="sub">на новый график платежей</div>
+<div class="service-title">Банки</div>
+<div class="service-sub">Новый график платежей</div>
 </div>
-<div class="arrow">›</div>
+<div class="service-arrow">›</div>
 </div>
-<div class="card">
-<div class="icon" style="background:#e3f2fd">🏦</div>
+<div class="service-card">
+<div class="service-icon green">🛡️</div>
 <div>
-<div class="title">Банки - заполнить шаблон</div>
-<div class="sub">на новый график платежей</div>
+<div class="service-title">Коллекторы</div>
+<div class="service-sub">Новый график платежей</div>
 </div>
-<div class="arrow">›</div>
+<div class="service-arrow">›</div>
 </div>
-<div class="card">
-<div class="icon" style="background:#f3e5f5">🛡️</div>
-<div>
-<div class="title">Коллектора - заполнить шаблон</div>
-<div class="sub">на новый график платежей</div>
-</div>
-<div class="arrow">›</div>
-</div>
-<div class="nav">
+<div class="bottom-nav">
 <div class="nav-item active"><div class="nav-icon"></div>Шаблоны</div>
-<div class="nav-item"><div class="nav-icon">☑️</div>Чек-лист</div>
+<div class="nav-item"><div class="nav-icon">️</div>Чек-лист</div>
 <div class="nav-item"><div class="nav-icon">🎓</div>Курсы</div>
 <div class="nav-item"><div class="nav-icon">👤</div>Профиль</div>
 </div>
