@@ -1,1 +1,92 @@
-
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Шаблоны</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:var(--tg-theme-bg-color,#f5f5f5);color:var(--tg-theme-text-color,#000);padding-bottom:80px}
+.header{background:var(--tg-theme-bg-color,#fff);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.header-title{font-size:24px;font-weight:700}
+.lang-btn{padding:6px 12px;border-radius:8px;border:none;background:var(--tg-theme-secondary-bg-color,#f0f0f0);font-size:14px;margin-left:8px}
+.sub-block{background:linear-gradient(135deg,#2c3e50,#34495e);margin:16px;padding:20px;border-radius:16px;color:#fff}
+.sub-label{font-size:12px;opacity:.8;text-transform:uppercase}
+.sub-status{font-size:24px;font-weight:700;margin:8px 0 16px}
+.sub-btn{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:16px;font-weight:600}
+.balance{margin-top:12px;font-size:14px;opacity:.8}
+.my-doc{background:var(--tg-theme-bg-color,#fff);margin:16px;padding:16px;border-radius:12px;font-size:16px;font-weight:500}
+.section-title{padding:16px;font-size:14px;color:#999}
+.card{background:var(--tg-theme-bg-color,#fff);margin:0 16px 12px;padding:16px;border-radius:16px;display:flex;align-items:center;gap:12px}
+.icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.title{font-size:16px;font-weight:600}
+.sub{font-size:13px;color:#999;margin-top:4px}
+.arrow{margin-left:auto;font-size:20px;color:#ccc}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--tg-theme-bg-color,#fff);display:flex;justify-content:space-around;padding:8px 0}
+.nav-item{text-align:center;font-size:11px;color:#999}
+.nav-item.active{color:#3390ec}
+.nav-icon{font-size:24px}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="header-title">Шаблоны</div>
+<div>
+<button class="lang-btn">🇺 РУС</button>
+<button class="lang-btn">🇰🇿 ҚАЗ</button>
+</div>
+</div>
+<div class="sub-block">
+<div class="sub-label">ПОДПИСКА</div>
+<div class="sub-status">Не активна</div>
+<button class="sub-btn">🚀 Оформить подписку →</button>
+<div class="balance">Баланс: 0.00 ₸ · пополнить</div>
+</div>
+<div class="my-doc">📁 Мои документы</div>
+<div class="section-title">Выберите тип услуги 📋</div>
+<div class="card">
+<div class="icon" style="background:#fff3e0">🔒</div>
+<div>
+<div class="title">Аресты - заполнить шаблон</div>
+<div class="sub">Возражение нотариусу | суд аресты</div>
+</div>
+<div class="arrow">›</div>
+</div>
+<div class="card">
+<div class="icon" style="background:#ffebee">📅</div>
+<div>
+<div class="title">МФО - заполнить шаблон</div>
+<div class="sub">на новый график платежей</div>
+</div>
+<div class="arrow">›</div>
+</div>
+<div class="card">
+<div class="icon" style="background:#e3f2fd">🏦</div>
+<div>
+<div class="title">Банки - заполнить шаблон</div>
+<div class="sub">на новый график платежей</div>
+</div>
+<div class="arrow">›</div>
+</div>
+<div class="card">
+<div class="icon" style="background:#f3e5f5">🛡️</div>
+<div>
+<div class="title">Коллектора - заполнить шаблон</div>
+<div class="sub">на новый график платежей</div>
+</div>
+<div class="arrow">›</div>
+</div>
+<div class="nav">
+<div class="nav-item active"><div class="nav-icon"></div>Шаблоны</div>
+<div class="nav-item"><div class="nav-icon">☑️</div>Чек-лист</div>
+<div class="nav-item"><div class="nav-icon">🎓</div>Курсы</div>
+<div class="nav-item"><div class="nav-icon">👤</div>Профиль</div>
+</div>
+<script>
+const tg=window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+</script>
+</body>
+</html>
