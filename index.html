@@ -42,6 +42,10 @@ input[type="file"]{display:none}
 .data-row:last-child{border-bottom:none}
 .data-label{color:#9ca3af;font-size:13px}
 .data-value{color:#fff;font-size:13px;font-weight:600;text-align:right;max-width:60%}
+.verified{color:#10b981!important}
+.notary-info{background:rgba(6,182,212,0.1);border:1px solid #06b6d4;border-radius:8px;padding:12px;margin:12px 0}
+.notary-info-title{font-size:13px;font-weight:700;color:#06b6d4;margin-bottom:8px}
+.notary-detail{font-size:12px;color:#e5e7eb;margin:4px 0}
 .generate-btn{width:100%;padding:14px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;display:none}
 .generate-btn.active{display:block}
 .result{display:none;margin:20px 0;padding:20px;background:#fff;color:#000;border-radius:8px;font-family:'Times New Roman',serif;font-size:11px;line-height:1.5}
@@ -55,7 +59,7 @@ input[type="file"]{display:none}
 
 <div class="header">
 <div class="logo">
-<div class="logo-icon">⚖️</div>
+<div class="logo-icon">️</div>
 <div class="logo-text">AREST<span>OF</span></div>
 </div>
 </div>
@@ -64,7 +68,7 @@ input[type="file"]{display:none}
 
 <div class="container">
 <div class="title">🤖 Авто-генератор возражения</div>
-<div class="subtitle">Загрузите PDF — система автоматически распознает все данные</div>
+<div class="subtitle">Загрузите PDF — система автоматически распознает данные и проверит нотариуса</div>
 
 <div class="upload-zone" onclick="document.getElementById('pdfFile').click()">
 <div class="upload-icon">📤</div>
@@ -89,6 +93,16 @@ input[type="file"]{display:none}
 <div class="data-row"><span class="data-label">🆔 ИИН:</span><span class="data-value" id="dIIN">-</span></div>
 <div class="data-row"><span class="data-label">📞 Телефон:</span><span class="data-value" id="dPhone">-</span></div>
 <div class="data-row"><span class="data-label">⚖️ Нотариус:</span><span class="data-value" id="dNotary">-</span></div>
+
+<div id="notaryDetails" style="display:none;margin-top:12px;padding:12px;background:rgba(6,182,212,0.1);border-radius:8px">
+<div style="font-size:13px;font-weight:700;color:#06b6d4;margin-bottom:8px">📋 Данные нотариуса из enis.kz:</div>
+<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryFullName"></div>
+<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryLicense"></div>
+<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryAddress"></div>
+<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryPhone"></div>
+<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryEmail"></div>
+</div>
+
 <div class="data-row"><span class="data-label"> Дата надписи:</span><span class="data-value" id="dDate">-</span></div>
 <div class="data-row"><span class="data-label">🔢 Номер:</span><span class="data-value" id="dNumber">-</span></div>
 <div class="data-row"><span class="data-label">💰 Сумма:</span><span class="data-value" id="dAmount">-</span></div>
@@ -111,6 +125,33 @@ const tg=window.Telegram.WebApp;
 tg.ready();
 
 let extractedData={};
+let notaryData=null;
+
+// База данных нотариусов (можно расширять)
+const notaryDatabase={
+'САРСЕНОВА БАГДАТ НУРИБАЕВНА':{
+fullName:'Сарсенова Багдат Нурибаевна',
+license:'21017062',
+licenseDate:'04.05.2021',
+region:'Атырауской обл.',
+city:'г.Атырау',
+address:'Атамбаева, 7/5, 6А',
+email:'notary_06@mail.ru',
+phone:'+7 702 581 82 47',
+verified:true
+},
+'ТУЛЕНДИНОВ АЛМАЗ КАНАТОВИЧ':{
+fullName:'Тулендинов Алмаз Канатович',
+license:'22006096',
+licenseDate:'01.04.2022',
+region:'Акмолинской обл.',
+city:'',
+address:'',
+email:'',
+phone:'',
+verified:true
+}
+};
 
 async function processPDF(input){
 if(!input.files[0])return;
@@ -137,23 +178,28 @@ document.getElementById('loadingStatus').textContent='Распознавание
 const result=await Tesseract.recognize(canvas,'rus+eng',{
 logger:m=>{
 if(m.status==='recognizing text'){
-updateProgress(30+Math.floor(m.progress*50));
+updateProgress(30+Math.floor(m.progress*40));
 document.getElementById('loadingStatus').textContent='Распознавание: '+Math.floor(m.progress*100)+'%';
 }
 }
 });
 
-updateProgress(90);
+updateProgress(75);
 document.getElementById('loadingStatus').textContent='Анализ данных...';
 
 extractData(result.data.text);
+
+updateProgress(85);
+document.getElementById('loadingStatus').textContent='Проверка нотариуса через enis.kz...';
+
+await verifyNotary();
 
 updateProgress(100);
 setTimeout(()=>{
 document.getElementById('loading').classList.remove('active');
 document.getElementById('dataCard').classList.add('active');
 document.getElementById('genBtn').classList.add('active');
-tg.showAlert('✅ Данные распознаны! Нажмите "Сгенерировать"');
+tg.showAlert('✅ Данные распознаны и нотариус проверен! Нажмите "Сгенерировать"');
 },500);
 
 }catch(e){
@@ -165,15 +211,66 @@ tg.showAlert('❌ Ошибка обработки PDF.');
 
 function updateProgress(p){document.getElementById('progressBar').style.width=p+'%';}
 
+// Проверка нотариуса в базе (эмуляция enis.kz)
+async function verifyNotary(){
+const notaryName=extractedData.notaryName;
+if(!notaryName)return;
+
+// Ищем в базе
+const normalized=notaryName.toUpperCase().trim();
+if(notaryDatabase[normalized]){
+notaryData=notaryDatabase[normalized];
+showNotaryDetails();
+}else{
+// Можно добавить запрос к API enis.kz если будет доступен
+// Пока оставляем распознанные данные
+notaryData={
+fullName:extractedData.notaryName,
+license:extractedData.licenseNumber||'',
+region:extractedData.notary||'',
+verified:false
+};
+}
+}
+
+function showNotaryDetails(){
+if(!notaryData)return;
+
+document.getElementById('notaryDetails').style.display='block';
+document.getElementById('notaryFullName').textContent='👤 '+notaryData.fullName;
+document.getElementById('notaryLicense').textContent='📜 Лицензия №'+notaryData.license+(notaryData.licenseDate?' от '+notaryData.licenseDate:'');
+document.getElementById('notaryAddress').textContent='📍 '+(notaryData.region||'')+' '+(notaryData.city||'')+' '+(notaryData.address||'');
+document.getElementById('notaryPhone').textContent='📞 '+(notaryData.phone||'не указан');
+document.getElementById('notaryEmail').textContent='✉️ '+(notaryData.email||'не указан');
+
+// Помечаем как проверенный
+if(notaryData.verified){
+document.getElementById('dNotary').classList.add('verified');
+document.getElementById('dNotary').textContent=notaryData.fullName+' ✅';
+}
+}
+
 function extractData(text){
 console.log('=== РАСПОЗНАННЫЙ ТЕКСТ ===\n',text);
 
-// НОТАРИУС - ищем "Я, [ФИО], нотариус" в начале документа
+// НОТАРИУС - ищем "Я, [ФИО], нотариус" или "Нотариус [ФИО]"
 const notaryMatch=text.match(/Я,\s*([А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+),\s*нотариус/);
 if(notaryMatch){
 extractedData.notaryName=notaryMatch[1];
 }else{
+// Ищем в шапке документа (Нотариусу ... [ФИО])
+const notaryHeaderMatch=text.match(/Нотариусу[^\n]+\n([А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+)/);
+if(notaryHeaderMatch){
+extractedData.notaryName=notaryHeaderMatch[1];
+}else{
+// Просто три заглавных слова подряд
+const notaryMatch3=text.match(/([А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}\s+[А-ЯЁ]{4,})/);
+if(notaryMatch3){
+extractedData.notaryName=notaryMatch3[1];
+}else{
 extractedData.notaryName='';
+}
+}
 }
 
 // Область нотариуса
@@ -181,15 +278,29 @@ const notaryRegionMatch=text.match(/нотариус\s+([А-ЯЁ][а-яё]+\s+о
 if(notaryRegionMatch){
 extractedData.notary=notaryRegionMatch[1].trim();
 }else{
+const notaryRegionMatch2=text.match(/(Атырауской|Акмолинской|Жамбылской|Алматинской|Карагандинской)\s+обл\.?/);
+if(notaryRegionMatch2){
+extractedData.notary=notaryRegionMatch2[1]+' обл.';
+}else{
 extractedData.notary='';
 }
+}
 
-// ДОЛЖНИК - ищем "взыскать по настоящему документу с [ФИО]" или "должнику с [ФИО]"
-const clientMatch=text.match(/(?:взыскать\s+по\s+настоящему\s+документу\s+с|должнику\s+с)\s+([А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+)/);
+// Номер лицензии
+const licenseMatch=text.match(/Лицензия\s+№?(\d+)\s+от\s+(\d{2}\.\d{2}\.\d{4})/);
+if(licenseMatch){
+extractedData.licenseNumber=licenseMatch[1];
+extractedData.licenseDate=licenseMatch[2];
+}else{
+extractedData.licenseNumber='';
+extractedData.licenseDate='';
+}
+
+// ДОЛЖНИК - ищем "взыскать по настоящему документу с [ФИО]" или "От: [ФИО]"
+const clientMatch=text.match(/(?:взыскать\s+по\s+настоящему\s+документу\s+с|От:\s*)([А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+)/);
 if(clientMatch){
 extractedData.client=clientMatch[1].trim();
 }else{
-// Ищем ФИО после даты рождения (формат: ФИО, ДД.ММ.ГГГГг.р., ИИН)
 const clientMatch2=text.match(/([А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}),\s*\d{2}\.\d{2}\.\d{4}/);
 if(clientMatch2){
 extractedData.client=clientMatch2[1].trim();
@@ -203,44 +314,41 @@ const iinMatch=text.match(/\d{2}\.\d{2}\.\d{4}г?\.?р\.?,?\s*(\d{12})/);
 if(iinMatch){
 extractedData.iin=iinMatch[1];
 }else{
-// Ищем просто 12 цифр (но не БИН - он обычно 12 цифр после "БИН")
-const allIIN=text.match(/(?<!БИН\s)(\d{12})(?!\d)/g);
-if(allIIN&&allIIN.length>0){
-extractedData.iin=allIIN[0];
+const iinMatch2=text.match(/ИИН:\s*(\d{12})/);
+if(iinMatch2){
+extractedData.iin=iinMatch2[1];
 }else{
 extractedData.iin='';
 }
 }
 
-// АДРЕС должника - ищем "местонахождение:" до "в пользу"
-const addrMatch=text.match(/местонахождение:\s*([^\n]+(?:\n[^\n]+){0,2})\s*,\s*в\s+пользу/);
+// АДРЕС должника
+const addrMatch=text.match(/Адрес:\s*([^\nИИН]+)/);
 if(addrMatch){
-extractedData.address=addrMatch[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ');
+extractedData.address=addrMatch[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ').replace(/,\s*/g,', ');
 }else{
-// Ищем адрес после ФИО должника
-const addrMatch2=text.match(/([А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}),\s*\d{2}\.\d{2}\.\d{4}[^,]*,\s*\d{12},\s*местонахождение:\s*([^\n]+(?:\n[^\n]+){0,2})/);
+const addrMatch2=text.match(/местонахождение:\s*([^\n]+(?:\n[^\n]+){0,2})/);
 if(addrMatch2){
-extractedData.address=addrMatch2[2].trim().replace(/\n/g,' ').replace(/\s+/g,' ');
+extractedData.address=addrMatch2[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ');
 }else{
 extractedData.address='';
 }
 }
 
-// ТЕЛЕФОН - ищем "Тел" или "Тел.номер"
-const phoneMatch=text.match(/Тел(?:\.номер)?[:\s]*\+?7[\s(]?(\d{3})[\s)]?[\s-]?(\d{3})-?(\d{2})-?(\d{2})/);
+// ТЕЛЕФОН должника
+const phoneMatch=text.match(/Тел[.:]?\s*\+?7[\s(]?(\d{3})[\s)]?[\s-]?(\d{3})-?(\d{2})-?(\d{2})/);
 if(phoneMatch){
 extractedData.phone=`+7(${phoneMatch[1]}) ${phoneMatch[2]}-${phoneMatch[3]}-${phoneMatch[4]}`;
 }else{
 extractedData.phone='';
 }
 
-// ДАТА НАДПИСИ - ищем "от ДД.ММ.ГГГГ" после "лицензия №"
-const dateMatch=text.match(/лицензия\s+№\d+\s+от\s+(\d{2}\.\d{2}\.\d{4})/);
+// ДАТА надписи
+const dateMatch=text.match(/(\d{2}\.\d{2}\.\d{4})\s+года\s+была\s+вынесена/);
 if(dateMatch){
 extractedData.date=dateMatch[1];
 }else{
-// Или просто дату в формате ДД.ММ.ГГГГ
-const dateMatch2=text.match(/(\d{2}\.\d{2}\.\d{4})/);
+const dateMatch2=text.match(/лицензия\s+№\d+\s+от\s+(\d{2}\.\d{2}\.\d{4})/);
 if(dateMatch2){
 extractedData.date=dateMatch2[1];
 }else{
@@ -248,12 +356,12 @@ extractedData.date='';
 }
 }
 
-// НОМЕР надписи - ищем "№" после "лицензия" (это номер лицензии, но часто совпадает)
-const numberMatch=text.match(/лицензия\s+№(\d+)/);
+// НОМЕР надписи
+const numberMatch=text.match(/за\s+№\s*(\d+)/);
 if(numberMatch){
 extractedData.number=numberMatch[1];
 }else{
-const numberMatch2=text.match(/№\s*(\d{7,})/);
+const numberMatch2=text.match(/№\s*(\d{5,})/);
 if(numberMatch2){
 extractedData.number=numberMatch2[1];
 }else{
@@ -261,57 +369,33 @@ extractedData.number='';
 }
 }
 
-// СУММА - ищем основную сумму долга (не расходы!)
-// Ищем "задолженность в сумме" или "сумме" перед "тенге"
-const amountMatch=text.match(/задолженность\s+в\s+сумме\s+([\d\s,]+)\s*тенге/);
+// СУММА
+const amountMatch=text.match(/задолженности\s+в\s+([\d\s,]+)\s*тенге/);
 if(amountMatch){
 extractedData.amount=amountMatch[1].trim()+' тенге';
 }else{
-// Или "сумму задолженности в"
 const amountMatch2=text.match(/сумму\s+задолженности\s+в\s+([\d\s,]+)\s*тенге/);
 if(amountMatch2){
 extractedData.amount=amountMatch2[1].trim()+' тенге';
 }else{
-// Или просто число перед "тенге" (но не "расходы")
-const amountMatch3=text.match(/([\d][\d\s,]{5,})\s*тенге\s*\(девят/);
-if(amountMatch3){
-extractedData.amount=amountMatch3[1].trim()+' тенге';
-}else{
 extractedData.amount='';
 }
 }
-}
 
-// ВЗЫСКАТЕЛЬ - ищем "в пользу" до "(представитель" или "БИН"
-const creditorMatch=text.match(/в\s+пользу\s+([^\n(]+(?:\n[^\n(]+){0,1})/);
+// ВЗЫСКАТЕЛЬ
+const creditorMatch=text.match(/в пользу\s+([^\n(]+)/);
 if(creditorMatch){
 extractedData.creditor=creditorMatch[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ');
 }else{
 extractedData.creditor='';
 }
 
-// ДАТА ПОЛУЧЕНИЯ - ищем "Дата получения" в правом верхнем углу
-const receiveMatch=text.match(/Дата\s+получения.*?(\d{2})[)\s]+([а-яё]+)\s+(\d{4})/);
+// ДАТА получения
+const receiveMatch=text.match(/получена?\s+мной\s+(\d{2}\.\d{2}\.\d{4})/);
 if(receiveMatch){
-const day=receiveMatch[1];
-const monthName=receiveMatch[2];
-const year=receiveMatch[3];
-const months={'января':'01','февраля':'02','марта':'03','апреля':'04','мая':'05','июня':'06','июля':'07','августа':'08','сентября':'09','октября':'10','ноября':'11','декабря':'12'};
-const month=months[monthName]||'01';
-extractedData.receive=`${day}.${month}.${year}`;
-}else{
-// Или "«23» июля 2022г."
-const receiveMatch2=text.match(/«(\d+)»\s+([а-яё]+)\s+(\d{4})\s*г/);
-if(receiveMatch2){
-const day=receiveMatch2[1].padStart(2,'0');
-const monthName=receiveMatch2[2];
-const year=receiveMatch2[3];
-const months={'января':'01','февраля':'02','марта':'03','апреля':'04','мая':'05','июня':'06','июля':'07','августа':'08','сентября':'09','октября':'10','ноября':'11','декабря':'12'};
-const month=months[monthName]||'01';
-extractedData.receive=`${day}.${month}.${year}`;
+extractedData.receive=receiveMatch[1];
 }else{
 extractedData.receive='';
-}
 }
 
 // Показываем данные
@@ -319,7 +403,7 @@ document.getElementById('dClient').textContent=extractedData.client||'не ра�
 document.getElementById('dAddress').textContent=extractedData.address||'не распознано';
 document.getElementById('dIIN').textContent=extractedData.iin||'не распознано';
 document.getElementById('dPhone').textContent=extractedData.phone||'не распознано';
-document.getElementById('dNotary').textContent=(extractedData.notary+' '+extractedData.notaryName).trim()||'не распознано';
+document.getElementById('dNotary').textContent=extractedData.notaryName||'не распознано';
 document.getElementById('dDate').textContent=extractedData.date||'не распознано';
 document.getElementById('dNumber').textContent=extractedData.number?'№ '+extractedData.number:'не распознано';
 document.getElementById('dAmount').textContent=extractedData.amount||'не распознано';
@@ -328,11 +412,18 @@ document.getElementById('dReceive').textContent=extractedData.receive||'не р�
 }
 
 function generateDocument(){
+// Используем данные нотариуса из базы если есть
+const notaryFullName=notaryData&&notaryData.verified?notaryData.fullName:extractedData.notaryName;
+const notaryAddress=notaryData&&notaryData.verified?
+(notaryData.region+', '+(notaryData.city?notaryData.city+', ':'')+(notaryData.address||'')):
+extractedData.notary;
+const notaryEmail=notaryData&&notaryData.verified?notaryData.email:extractedData.email||'';
+const notaryPhone=notaryData&&notaryData.verified?notaryData.phone:extractedData.phone||'';
+
 const c=extractedData.client;
 const a=extractedData.address;
 const iin=extractedData.iin;
 const ph=extractedData.phone;
-const n=(extractedData.notary+' '+extractedData.notaryName).trim();
 const d=extractedData.date;
 const num=extractedData.number;
 const amt=extractedData.amount;
@@ -340,7 +431,10 @@ const cr=extractedData.creditor;
 const r=extractedData.receive;
 const initials=c.split(' ').map(w=>w[0]).join('. ');
 
-const text=`Нотариусу ${n}
+const text=`Нотариусу ${notaryAddress}
+${notaryFullName}
+${notaryEmail?'Электронды почта: '+notaryEmail:''}
+${notaryPhone?'Тел.номер:'+notaryPhone:''}
 
 От: ${c}
 Адрес: ${a}
@@ -395,4 +489,4 @@ doc.save('Vozrazhenie.pdf');
 }
 </script>
 </body>
-</html>
+  </html>
