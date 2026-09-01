@@ -38,9 +38,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .nav-item{flex:1;text-align:center;color:#6b7280;font-size:11px;font-weight:600;cursor:pointer}
 .nav-item.active{color:#dc2626}
 .nav-icon{font-size:22px;margin-bottom:2px}
+.page{display:none}
+.page.active{display:block}
+.back-btn{background:#1f2937;border:1px solid #374151;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin:16px;display:flex;align-items:center;gap:8px}
+.form-container{margin:0 16px;padding:20px;background:linear-gradient(135deg,#1f2937,#111827);border-radius:16px;border:1px solid #374151}
+.form-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:16px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;color:#9ca3af;margin-bottom:8px;font-weight:600}
+.form-input,.form-textarea{width:100%;padding:12px 14px;background:#0a0e1a;border:1px solid #374151;border-radius:10px;color:#fff;font-size:14px;font-family:inherit}
+.form-input:focus,.form-textarea:focus{outline:none;border-color:#dc2626}
+.form-textarea{min-height:100px;resize:vertical}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
+.submit-btn:active{transform:scale(.98)}
 </style>
 </head>
 <body>
+
+<!-- Главная страница -->
+<div id="homePage" class="page active">
 <div class="header">
 <div class="logo">
 <div class="logo-icon">⚖️</div>
@@ -52,70 +67,182 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 </div>
 <div class="welcome">
-<div class="welcome-title"> Добро пожаловать!</div>
+<div class="welcome-title">👋 Добро пожаловать!</div>
 <div class="welcome-sub">Решаем проблемы с долгами и арестами онлайн</div>
 </div>
 <div class="stats">
-<div class="stat-card">
-<div class="stat-value">1,248</div>
-<div class="stat-label">Всего заявок</div>
+<div class="stat-card"><div class="stat-value">1,248</div><div class="stat-label">Всего заявок</div></div>
+<div class="stat-card"><div class="stat-value">342</div><div class="stat-label">В работе</div></div>
+<div class="stat-card"><div class="stat-value">756</div><div class="stat-label">Выполнено</div></div>
+<div class="stat-card"><div class="stat-value">150</div><div class="stat-label">Новых</div></div>
 </div>
-<div class="stat-card">
-<div class="stat-value">342</div>
-<div class="stat-label">В работе</div>
-</div>
-<div class="stat-card">
-<div class="stat-value">756</div>
-<div class="stat-label">Выполнено</div>
-</div>
-<div class="stat-card">
-<div class="stat-value">150</div>
-<div class="stat-label">Новых</div>
-</div>
-</div>
-<div class="section-title">📋 Услуги</div>
-<div class="service-card">
+<div class="section-title"> Услуги</div>
+<div class="service-card" onclick="showPage('arrestsPage')">
 <div class="service-icon red">🔒</div>
-<div>
-<div class="service-title">Аресты</div>
-<div class="service-sub">Возражение нотариусу | суд аресты</div>
-</div>
+<div><div class="service-title">Аресты</div><div class="service-sub">Возражение нотариусу | суд аресты</div></div>
 <div class="service-arrow">›</div>
 </div>
-<div class="service-card">
+<div class="service-card" onclick="showPage('mfoPage')">
 <div class="service-icon orange">📅</div>
-<div>
-<div class="service-title">МФО</div>
-<div class="service-sub">Новый график платежей</div>
-</div>
+<div><div class="service-title">МФО</div><div class="service-sub">Новый график платежей</div></div>
 <div class="service-arrow">›</div>
 </div>
-<div class="service-card">
+<div class="service-card" onclick="showPage('banksPage')">
 <div class="service-icon blue">🏦</div>
-<div>
-<div class="service-title">Банки</div>
-<div class="service-sub">Новый график платежей</div>
-</div>
+<div><div class="service-title">Банки</div><div class="service-sub">Новый график платежей</div></div>
 <div class="service-arrow">›</div>
 </div>
-<div class="service-card">
-<div class="service-icon green">️</div>
-<div>
-<div class="service-title">Коллекторы</div>
-<div class="service-sub">Новый график платежей</div>
-</div>
+<div class="service-card" onclick="showPage('collectorsPage')">
+<div class="service-icon green">🛡️</div>
+<div><div class="service-title">Коллекторы</div><div class="service-sub">Новый график платежей</div></div>
 <div class="service-arrow">›</div>
 </div>
 <div class="bottom-nav">
 <div class="nav-item active"><div class="nav-icon">📄</div>Шаблоны</div>
 <div class="nav-item"><div class="nav-icon">☑️</div>Чек-лист</div>
-<div class="nav-item"><div class="nav-icon">🎓</div>Курсы</div>
-<div class="nav-item"><div class="nav-icon">👤</div>Профиль</div>
+<div class="nav-item"><div class="nav-icon"></div>Курсы</div>
+<div class="nav-item"><div class="nav-icon"></div>Профиль</div>
 </div>
+</div>
+
+<!-- Страница Аресты -->
+<div id="arrestsPage" class="page">
+<div class="header">
+<div class="logo">
+<div class="logo-icon">️</div>
+<div class="logo-text">AREST<span>OF</span></div>
+</div>
+</div>
+<button class="back-btn" onclick="showPage('homePage')">← Назад</button>
+<div class="form-container">
+<div class="form-title">🔒 Аресты - Заполнить шаблон</div>
+<div class="form-group">
+<label class="form-label">Имя и фамилия</label>
+<input type="text" class="form-input" placeholder="Иванов Иван Иванович">
+</div>
+<div class="form-group">
+<label class="form-label">Номер исполнительного производства</label>
+<input type="text" class="form-input" placeholder="№ 12345/2024">
+</div>
+<div class="form-group">
+<label class="form-label">Сумма задолженности (₸)</label>
+<input type="number" class="form-input" placeholder="500000">
+</div>
+<div class="form-group">
+<label class="form-label">Описание проблемы</label>
+<textarea class="form-textarea" placeholder="Опишите вашу ситуацию..."></textarea>
+</div>
+<button class="submit-btn" onclick="submitForm('Аресты')">📤 Отправить заявку</button>
+</div>
+</div>
+
+<!-- Страница МФО -->
+<div id="mfoPage" class="page">
+<div class="header">
+<div class="logo">
+<div class="logo-icon">⚖️</div>
+<div class="logo-text">AREST<span>OF</span></div>
+</div>
+</div>
+<button class="back-btn" onclick="showPage('homePage')">← Назад</button>
+<div class="form-container">
+<div class="form-title">📅 МФО - Заполнить шаблон</div>
+<div class="form-group">
+<label class="form-label">Имя и фамилия</label>
+<input type="text" class="form-input" placeholder="Иванов Иван Иванович">
+</div>
+<div class="form-group">
+<label class="form-label">Название МФО</label>
+<input type="text" class="form-input" placeholder="Kredito24, MoneyMan...">
+</div>
+<div class="form-group">
+<label class="form-label">Сумма долга (₸)</label>
+<input type="number" class="form-input" placeholder="150000">
+</div>
+<div class="form-group">
+<label class="form-label">Описание проблемы</label>
+<textarea class="form-textarea" placeholder="Опишите вашу ситуацию..."></textarea>
+</div>
+<button class="submit-btn" onclick="submitForm('МФО')">📤 Отправить заявку</button>
+</div>
+</div>
+
+<!-- Страница Банки -->
+<div id="banksPage" class="page">
+<div class="header">
+<div class="logo">
+<div class="logo-icon">⚖️</div>
+<div class="logo-text">AREST<span>OF</span></div>
+</div>
+</div>
+<button class="back-btn" onclick="showPage('homePage')">← Назад</button>
+<div class="form-container">
+<div class="form-title">🏦 Банки - Заполнить шаблон</div>
+<div class="form-group">
+<label class="form-label">Имя и фамилия</label>
+<input type="text" class="form-input" placeholder="Иванов Иван Иванович">
+</div>
+<div class="form-group">
+<label class="form-label">Название банка</label>
+<input type="text" class="form-input" placeholder="Kaspi, Halyk, BTA...">
+</div>
+<div class="form-group">
+<label class="form-label">Сумма долга (₸)</label>
+<input type="number" class="form-input" placeholder="2000000">
+</div>
+<div class="form-group">
+<label class="form-label">Описание проблемы</label>
+<textarea class="form-textarea" placeholder="Опишите вашу ситуацию..."></textarea>
+</div>
+<button class="submit-btn" onclick="submitForm('Банки')">📤 Отправить заявку</button>
+</div>
+</div>
+
+<!-- Страница Коллекторы -->
+<div id="collectorsPage" class="page">
+<div class="header">
+<div class="logo">
+<div class="logo-icon">⚖️</div>
+<div class="logo-text">AREST<span>OF</span></div>
+</div>
+</div>
+<button class="back-btn" onclick="showPage('homePage')">← Назад</button>
+<div class="form-container">
+<div class="form-title">🛡️ Коллекторы - Заполнить шаблон</div>
+<div class="form-group">
+<label class="form-label">Имя и фамилия</label>
+<input type="text" class="form-input" placeholder="Иванов Иван Иванович">
+</div>
+<div class="form-group">
+<label class="form-label">Название коллекторской компании</label>
+<input type="text" class="form-input" placeholder="Название компании">
+</div>
+<div class="form-group">
+<label class="form-label">Сумма долга (₸)</label>
+<input type="number" class="form-input" placeholder="300000">
+</div>
+<div class="form-group">
+<label class="form-label">Описание проблемы</label>
+<textarea class="form-textarea" placeholder="Опишите вашу ситуацию..."></textarea>
+</div>
+<button class="submit-btn" onclick="submitForm('Коллекторы')">📤 Отправить заявку</button>
+</div>
+</div>
+
 <script>
 const tg=window.Telegram.WebApp;
 tg.ready();
 tg.expand();
+
+function showPage(pageId){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(pageId).classList.add('active');
+window.scrollTo(0,0);
+}
+
+function submitForm(serviceName){
+tg.showAlert('✅ Заявка "'+serviceName+'" отправлена! Мы свяжемся с вами в ближайшее время.');
+}
 </script>
 </body>
   </html>
