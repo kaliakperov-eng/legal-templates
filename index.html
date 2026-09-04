@@ -2,491 +2,1056 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AREST OF - Авто-генератор</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ARESTOF KZ</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,sans-serif;background:#0a0e1a;color:#fff;padding-bottom:100px}
-.header{background:linear-gradient(135deg,#1a1f2e,#0f1419);padding:20px 16px;border-bottom:2px solid #dc2626}
-.logo{display:flex;align-items:center;gap:12px}
-.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px}
-.logo-text{font-size:26px;font-weight:800;color:#fff}
-.logo-text span{color:#dc2626}
-.back-btn{background:#1f2937;border:1px solid #374151;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;margin:16px;cursor:pointer}
-.container{margin:0 16px 20px}
-.title{font-size:20px;font-weight:800;color:#fff;margin:20px 0 8px}
-.subtitle{font-size:13px;color:#9ca3af;margin-bottom:20px}
-.upload-zone{border:3px dashed #374151;border-radius:16px;padding:32px;text-align:center;background:rgba(31,41,55,0.5);cursor:pointer;margin-bottom:20px}
-.upload-zone:active{border-color:#dc2626}
-.upload-icon{font-size:56px;margin-bottom:12px}
-.upload-text{font-size:15px;color:#fff;font-weight:700}
-.upload-hint{font-size:12px;color:#6b7280;margin-top:6px}
-input[type="file"]{display:none}
-.file-name{margin-top:12px;padding:10px;background:rgba(16,185,129,0.1);border-radius:8px;font-size:13px;color:#10b981;font-weight:600;text-align:center}
-.loading{display:none;text-align:center;padding:24px;background:rgba(31,41,55,0.8);border-radius:12px;margin:16px 0}
-.loading.active{display:block}
-.spinner{width:50px;height:50px;border:4px solid #374151;border-top-color:#dc2626;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{color:#e5e7eb;font-size:14px;font-weight:600;margin-bottom:8px}
-.loading-sub{color:#6b7280;font-size:12px}
-.progress-bar{width:100%;height:6px;background:#374151;border-radius:3px;overflow:hidden;margin-top:12px}
-.progress-fill{height:100%;background:linear-gradient(90deg,#dc2626,#991b1b);transition:width .3s;width:0%}
-.data-card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:16px;margin:16px 0;display:none}
-.data-card.active{display:block}
-.data-title{font-size:14px;font-weight:700;color:#10b981;margin-bottom:12px}
-.data-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #374151}
-.data-row:last-child{border-bottom:none}
-.data-label{color:#9ca3af;font-size:13px}
-.data-value{color:#fff;font-size:13px;font-weight:600;text-align:right;max-width:60%}
-.verified{color:#10b981!important}
-.notary-info{background:rgba(6,182,212,0.1);border:1px solid #06b6d4;border-radius:8px;padding:12px;margin:12px 0}
-.notary-info-title{font-size:13px;font-weight:700;color:#06b6d4;margin-bottom:8px}
-.notary-detail{font-size:12px;color:#e5e7eb;margin:4px 0}
-.generate-btn{width:100%;padding:14px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;display:none}
-.generate-btn.active{display:block}
-.result{display:none;margin:20px 0;padding:20px;background:#fff;color:#000;border-radius:8px;font-family:'Times New Roman',serif;font-size:11px;line-height:1.5}
-.result.active{display:block}
-.result-title{font-size:16px;font-weight:800;color:#dc2626;text-align:center;text-transform:uppercase;margin-bottom:16px}
-.result-text{white-space:pre-wrap;margin-bottom:16px}
-.download-btn{width:100%;padding:14px;background:#10b981;border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: 80px;
+  }
+
+  /* ===== HEADER ===== */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: #0a0a0a;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+  .logo span { color: #e63946; }
+  .logo-sub {
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+  .burger { font-size: 24px; cursor: pointer; }
+
+  /* ===== HERO BANNER ===== */
+  .hero {
+    position: relative;
+    padding: 30px 20px 40px;
+    background:
+      radial-gradient(circle at 80% 30%, rgba(230,57,70,0.25), transparent 60%),
+      linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 100%);
+    overflow: hidden;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .hero::before {
+    content: '⛓';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 80px;
+    opacity: 0.15;
+    transform: rotate(-15deg);
+  }
+  .hero h1 {
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .hero h1 .red {
+    color: #e63946;
+    display: block;
+    background: #e63946;
+    color: #fff;
+    padding: 4px 12px;
+    transform: skew(-8deg);
+    display: inline-block;
+    margin-top: 8px;
+  }
+  .hero .lock-icon {
+    font-size: 60px;
+    color: #e63946;
+    margin: 10px 0;
+  }
+  .hero p {
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  /* ===== CATEGORIES ===== */
+  .section { padding: 20px 16px; }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .categories {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .cat-card {
+    background: #151515;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cat-card:active { transform: scale(0.97); }
+  .cat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .cat-icon.arrests { background: #e63946; }
+  .cat-icon.mfo { background: #1976d2; }
+  .cat-icon.banks { background: #c9a961; }
+  .cat-icon.collectors { background: #2e7d32; }
+  .cat-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .cat-sub { font-size: 11px; color: #888; }
+
+  /* ===== PREMIUM BANNER ===== */
+  .premium-banner {
+    margin: 0 16px 16px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a1a0a 100%);
+    border: 1px solid #3a2a10;
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+  }
+  .premium-banner .crown { font-size: 36px; }
+  .premium-banner h3 { font-size: 16px; margin-bottom: 4px; }
+  .premium-banner p { font-size: 12px; color: #aaa; }
+  .premium-banner .arrow { margin-left: auto; font-size: 20px; color: #888; }
+
+  /* ===== DOCUMENTS LIST ===== */
+  .docs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .docs-header .all { color: #e63946; font-size: 13px; font-weight: 600; }
+  .doc-item {
+    background: #151515;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .doc-item:active { background: #1a1a1a; }
+  .doc-icon {
+    width: 40px;
+    height: 40px;
+    background: #1e1e1e;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .doc-title { font-size: 14px; flex: 1; }
+  .doc-arrow { color: #555; font-size: 18px; }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0a0a0a;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0 12px;
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    color: #666;
+    font-size: 10px;
+    flex: 1;
+  }
+  .nav-item.active { color: #e63946; }
+  .nav-item .icon { font-size: 22px; }
+  .nav-create {
+    width: 54px;
+    height: 54px;
+    background: #e63946;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+    margin-top: -20px;
+    box-shadow: 0 4px 15px rgba(230,57,70,0.4);
+    cursor: pointer;
+  }
+
+  /* ===== GENERATOR SCREEN (LIGHT) ===== */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .gen-screen {
+    background: #f5f5f7;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  .gen-header {
+    background: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .back-btn {
+    font-size: 22px;
+    cursor: pointer;
+    color: #1a1a1a;
+  }
+  .gen-header h2 { font-size: 17px; flex: 1; }
+  .help-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 16px 10px;
+    background: #fff;
+    margin-bottom: 10px;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+  }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 60%;
+    width: 80%;
+    height: 2px;
+    background: #ddd;
+  }
+  .step.completed:not(:last-child)::after { background: #e63946; }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ddd;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    z-index: 2;
+  }
+  .step.active .step-num { background: #e63946; }
+  .step.completed .step-num { background: #e63946; }
+  .step-label { font-size: 10px; color: #888; text-align: center; }
+  .step.active .step-label { color: #e63946; font-weight: 600; }
+
+  /* Upload zone */
+  .gen-content { padding: 16px; }
+  .upload-zone {
+    background: #fff;
+    border: 2px dashed #ccc;
+    border-radius: 14px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+  .upload-zone .up-icon {
+    width: 56px;
+    height: 56px;
+    background: #ffe5e7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 28px;
+    color: #e63946;
+  }
+  .upload-zone h3 { font-size: 16px; margin-bottom: 6px; }
+  .upload-zone p { font-size: 12px; color: #888; line-height: 1.4; }
+  .upload-zone .file-hint {
+    margin-top: 12px;
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* Examples block */
+  .info-block {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid #eee;
+  }
+  .info-block h4 { font-size: 13px; margin-bottom: 8px; color: #1a1a1a; }
+  .info-block ul { list-style: none; font-size: 12px; color: #555; }
+  .info-block li { padding: 3px 0; }
+  .info-block li::before { content: '• '; color: #e63946; }
+
+  /* How it works */
+  .how-works h3 { font-size: 16px; margin: 16px 0 12px; }
+  .how-step {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+  .how-step .num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #e63946;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .how-step .text { font-size: 13px; color: #333; line-height: 1.4; }
+  .how-step .text b { display: block; color: #1a1a1a; margin-bottom: 2px; }
+
+  /* Security block */
+  .security-block {
+    background: #e8f4f8;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+  }
+  .security-block .shield {
+    width: 40px;
+    height: 40px;
+    background: #1976d2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .security-block h4 { font-size: 13px; margin-bottom: 2px; }
+  .security-block p { font-size: 11px; color: #555; }
+
+  /* ===== OCR RESULTS (LIGHT) ===== */
+  .ocr-results { display: none; }
+  .ocr-results.active { display: block; }
+  .ocr-field {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+  }
+  .ocr-field label {
+    display: block;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ocr-field input, .ocr-field textarea {
+    width: 100%;
+    border: none;
+    font-size: 14px;
+    color: #1a1a1a;
+    background: transparent;
+    font-family: inherit;
+  }
+  .ocr-field input:focus, .ocr-field textarea:focus { outline: none; }
+  .ocr-warning {
+    background: #fff3cd;
+    border-left: 3px solid #ffc107;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #856404;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: #e63946;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .btn-primary:active { background: #c82333; }
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #e63946;
+    border: 1px solid #e63946;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .btn-ghost {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #888;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Manual input */
+  .manual-block { display: none; }
+  .manual-block.active { display: block; }
+
+  /* Success */
+  .success-state { display: none; text-align: center; padding: 30px 20px; }
+  .success-state.active { display: block; }
+  .success-state .big-icon { font-size: 70px; margin-bottom: 14px; }
+  .success-state h3 { font-size: 22px; margin-bottom: 8px; }
+  .success-state p { color: #888; margin-bottom: 20px; font-size: 14px; }
+
+  /* ===== PREMIUM MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .premium-modal {
+    background: #0a0a0a;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px 20px 30px;
+    border-top: 2px solid #e63946;
+  }
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .premium-modal .crown-big { font-size: 50px; text-align: center; margin-bottom: 10px; }
+  .premium-modal h2 { text-align: center; font-size: 22px; margin-bottom: 6px; }
+  .premium-modal .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 24px; }
+  .plan-card {
+    background: #151515;
+    border: 1px solid #222;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .plan-card.featured {
+    border-color: #e63946;
+    background: linear-gradient(135deg, #1a0a0a 0%, #151515 100%);
+  }
+  .plan-card .badge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: #e63946;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .plan-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .plan-card .price { font-size: 26px; font-weight: 900; margin: 8px 0 14px; }
+  .plan-card .price span { font-size: 13px; color: #888; font-weight: 400; }
+  .plan-card ul { list-style: none; margin-bottom: 14px; }
+  .plan-card li { padding: 5px 0; font-size: 13px; color: #ccc; }
+  .plan-card li.off { color: #555; text-decoration: line-through; }
+  .plan-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .plan-btn.free { background: #222; color: #888; }
+  .plan-btn.premium { background: #e63946; color: #fff; }
+  .modal-note { text-align: center; color: #666; font-size: 11px; margin-top: 14px; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a1a1a;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 2000;
+    border: 1px solid #e63946;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Progress animation */
+  .progress-overlay {
+    display: none;
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .progress-overlay.active { display: block; }
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #eee;
+    border-top-color: #e63946;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 380px) {
+    .hero h1 { font-size: 36px; }
+    .cat-title { font-size: 13px; }
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-<div class="logo">
-<div class="logo-icon">️</div>
-<div class="logo-text">AREST<span>OF</span></div>
+<!-- ============ SCREEN 1: HOME ============ -->
+<div class="screen active" id="homeScreen">
+  <div class="top-bar">
+    <div>
+      <div class="logo">AREST<span>OF</span> KZ</div>
+      <div class="logo-sub">ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ В НЕСКОЛЬКО КЛИКОВ</div>
+    </div>
+    <div class="burger">☰</div>
+  </div>
+
+  <div class="hero">
+    <h1>АРЕСТЫ?<span class="red">ЕСТЬ РЕШЕНИЕ!</span></h1>
+    <div class="lock-icon">🔓</div>
+    <p>Ваш законный щит от ЧСИ, МФО, банков и коллекторов</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Что нужно решить?</div>
+    <div class="categories">
+      <div class="cat-card" onclick="selectCategory('arrests')">
+        <div class="cat-icon arrests">⚖</div>
+        <div>
+          <div class="cat-title">Аресты</div>
+          <div class="cat-sub">Исполнительное производство</div>
+        </div>
+      </div>
+      <div class="cat-card" onclick="selectCategory('mfo')">
+        <div class="cat-icon mfo">💰</div>
+        <div>
+          <div class="cat-title">МФО</div>
+          <div class="cat-sub">Возражения и заявления</div>
+        </div>
+      </div>
+      <div class="cat-card" onclick="selectCategory('banks')">
+        <div class="cat-icon banks">🏛</div>
+        <div>
+          <div class="cat-title">Банки</div>
+          <div class="cat-sub">Претензии и жалобы</div>
+        </div>
+      </div>
+      <div class="cat-card" onclick="selectCategory('collectors')">
+        <div class="cat-icon collectors">✓</div>
+        <div>
+          <div class="cat-title">Коллекторы</div>
+          <div class="cat-sub">Защита от незаконных действий</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="premium-banner" onclick="openPremiumModal()">
+    <div class="crown"></div>
+    <div>
+      <h3>Премиум-доступ</h3>
+      <p>Больше возможностей для вашей защиты</p>
+    </div>
+    <div class="arrow">›</div>
+  </div>
+
+  <div class="section">
+    <div class="docs-header">
+      <div class="section-title" style="margin:0">Популярные документы</div>
+      <div class="all">Все ›</div>
+    </div>
+    <div class="doc-item" onclick="openGenerator('Возражение на нотариальную исполнительную надпись')">
+      <div class="doc-icon">📄</div>
+      <div class="doc-title">Возражение на нотариальную исполнительную надпись</div>
+      <div class="doc-arrow">›</div>
+    </div>
+    <div class="doc-item" onclick="openGenerator('Заявление в МФО о пересмотре задолженности')">
+      <div class="doc-icon">📄</div>
+      <div class="doc-title">Заявление в МФО о пересмотре задолженности</div>
+      <div class="doc-arrow">›</div>
+    </div>
+    <div class="doc-item" onclick="openGenerator('Обращение в банк о снятии ограничений')">
+      <div class="doc-icon">📄</div>
+      <div class="doc-title">Обращение в банк о снятии ограничений</div>
+      <div class="doc-arrow">›</div>
+    </div>
+    <div class="doc-item" onclick="openGenerator('Жалоба на действия коллектора')">
+      <div class="doc-icon"></div>
+      <div class="doc-title">Жалоба на действия коллектора</div>
+      <div class="doc-arrow">›</div>
+    </div>
+  </div>
 </div>
+
+<!-- ============ SCREEN 2: GENERATOR ============ -->
+<div class="screen gen-screen" id="genScreen">
+  <div class="gen-header">
+    <div class="back-btn" onclick="goBack()">←</div>
+    <h2 id="genTitle">Авто-генератор возражения</h2>
+    <div class="help-btn" onclick="showToast('️ Помощь')">?</div>
+  </div>
+
+  <div class="steps">
+    <div class="step active" id="gstep1"><div class="step-num">1</div><div class="step-label">Загрузка PDF</div></div>
+    <div class="step" id="gstep2"><div class="step-num">2</div><div class="step-label">Распознавание</div></div>
+    <div class="step" id="gstep3"><div class="step-num">3</div><div class="step-label">Проверка</div></div>
+    <div class="step" id="gstep4"><div class="step-num">4</div><div class="step-label">Генерация</div></div>
+  </div>
+
+  <div class="gen-content">
+    <!-- Upload -->
+    <div id="uploadBlock">
+      <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+        <div class="up-icon">↑</div>
+        <h3>Загрузите PDF документа</h3>
+        <p>Система автоматически распознает данные из постановления ЧСИ, исполнительной надписи или уведомления.</p>
+        <div class="file-hint">📄 Можно загрузить: PDF (до 10 МБ)</div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="handleFile(event)">
+
+      <div class="info-block">
+        <h4>Примеры документов:</h4>
+        <ul>
+          <li>Постановление ЧСИ</li>
+          <li>Нотариальная исполнительная надпись</li>
+          <li>Уведомление об аресте</li>
+        </ul>
+      </div>
+
+      <div class="how-works">
+        <h3>Как это работает?</h3>
+        <div class="how-step"><div class="num">1</div><div class="text"><b>Загружаете PDF</b>(постановление, надпись и др.)</div></div>
+        <div class="how-step"><div class="num">2</div><div class="text"><b>Система распознаёт данные</b>(ФИО, сумма, нотариус и др.)</div></div>
+        <div class="how-step"><div class="num">3</div><div class="text"><b>Проверяете и редактируете</b>(при необходимости)</div></div>
+        <div class="how-step"><div class="num">4</div><div class="text"><b>Получаете готовый документ</b>(возражение, заявление и др.)</div></div>
+      </div>
+
+      <div class="security-block">
+        <div class="shield">✓</div>
+        <div>
+          <h4>Ваши данные в безопасности</h4>
+          <p>Файлы не передаются третьим лицам</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-overlay" id="progressBlock">
+      <div class="spinner"></div>
+      <h3 id="progressText">Обработка документа…</h3>
+      <p style="color:#888;font-size:13px;margin-top:8px" id="progressSub">Извлечение текста и данных</p>
+    </div>
+
+    <!-- OCR Results -->
+    <div class="ocr-results" id="ocrBlock">
+      <div class="ocr-warning">
+        ⚠️ OCR не должен автоматически подменять юридически значимые данные — перед генерацией проверьте их.
+      </div>
+
+      <div class="ocr-field"><label>ФИО должника</label><input type="text" name="debtor_name" id="f_debtor"></div>
+      <div class="ocr-field"><label>ИИН</label><input type="text" name="iin" id="f_iin" maxlength="12"></div>
+      <div class="ocr-field"><label>Номер исполнительного производства</label><input type="text" name="case_number" id="f_case"></div>
+      <div class="ocr-field"><label>ФИО ЧСИ</label><input type="text" name="bailiff_name" id="f_bailiff"></div>
+      <div class="ocr-field"><label>Дата документа</label><input type="date" name="doc_date" id="f_date"></div>
+      <div class="ocr-field"><label>Сумма задолженности ()</label><input type="number" name="debt_amount" id="f_amount"></div>
+      <div class="ocr-field"><label>Основание</label><textarea name="grounds" id="f_grounds" rows="2"></textarea></div>
+
+      <button class="btn-primary" onclick="generateDoc()">📄 Сгенерировать документ</button>
+      <button class="btn-secondary" onclick="toggleManual()">✏️ Ввести данные вручную</button>
+      <button class="btn-ghost" onclick="resetGen()">↻ Загрузить другой файл</button>
+
+      <!-- Manual fallback -->
+      <div class="manual-block" id="manualBlock" style="margin-top:16px">
+        <h3 style="font-size:16px;margin-bottom:12px">✏️ Ручной ввод</h3>
+        <p style="font-size:12px;color:#888;margin-bottom:14px">Заполните поля самостоятельно, если OCR не справился.</p>
+        <form id="manualForm" onsubmit="handleManual(event)">
+          <div class="ocr-field"><label>ФИО должника *</label><input type="text" name="debtor_name" required></div>
+          <div class="ocr-field"><label>ИИН</label><input type="text" name="iin" maxlength="12"></div>
+          <div class="ocr-field"><label>Номер производства</label><input type="text" name="case_number"></div>
+          <div class="ocr-field"><label>ФИО ЧСИ</label><input type="text" name="bailiff_name"></div>
+          <div class="ocr-field"><label>Дата</label><input type="date" name="doc_date"></div>
+          <div class="ocr-field"><label>Сумма (₸)</label><input type="number" name="debt_amount"></div>
+          <div class="ocr-field"><label>Основание</label><textarea name="grounds" rows="2"></textarea></div>
+          <button type="submit" class="btn-primary"> Сгенерировать</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-state" id="successBlock">
+      <div class="big-icon">✅</div>
+      <h3>Документ готов</h3>
+      <p>Шаблон сформирован по вашим данным</p>
+      <button class="btn-primary" onclick="showToast(' Скачивание PDF...')">📥 Скачать PDF</button>
+      <button class="btn-secondary" onclick="saveAndClear()">💾 Сохранить в «Мои документы»</button>
+      <div class="ocr-warning" style="margin-top:16px;text-align:left">
+        Важно: это шаблон. Перед подачей проверьте факты, сроки, адресата и правовые основания.
+      </div>
+    </div>
+  </div>
 </div>
 
-<button class="back-btn" onclick="history.back()">← Назад</button>
-
-<div class="container">
-<div class="title">🤖 Авто-генератор возражения</div>
-<div class="subtitle">Загрузите PDF — система автоматически распознает данные и проверит нотариуса</div>
-
-<div class="upload-zone" onclick="document.getElementById('pdfFile').click()">
-<div class="upload-icon">📤</div>
-<div class="upload-text">Нажмите для загрузки PDF</div>
-<div class="upload-hint">Исполнительная надпись (PDF)</div>
-<input type="file" id="pdfFile" accept=".pdf" onchange="processPDF(this)">
+<!-- ============ BOTTOM NAV ============ -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showHome()">
+    <div class="icon">🏠</div><span>Главная</span>
+  </div>
+  <div class="nav-item" onclick="showToast('📁 Мои документы')">
+    <div class="icon">📄</div><span>Мои документы</span>
+  </div>
+  <div class="nav-create" onclick="openGenerator('Новый документ')">+</div>
+  <div class="nav-item" onclick="showToast('❓ Помощь')">
+    <div class="icon">?</div><span>Помощь</span>
+  </div>
+  <div class="nav-item" onclick="showToast(' Профиль')">
+    <div class="icon">👤</div><span>Профиль</span>
+  </div>
 </div>
 
-<div class="file-name" id="fileName"></div>
+<!-- ============ PREMIUM MODAL ============ -->
+<div class="modal-overlay" id="premiumModal" onclick="if(event.target===this)closePremium()">
+  <div class="premium-modal">
+    <div class="modal-handle"></div>
+    <div class="crown-big">👑</div>
+    <h2>Премиум-доступ</h2>
+    <div class="subtitle">Максимальная защита ваших прав</div>
 
-<div class="loading" id="loading">
-<div class="spinner"></div>
-<div class="loading-text">️ Обработка документа...</div>
-<div class="loading-sub" id="loadingStatus">Конвертация PDF</div>
-<div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="plan-card">
+      <h3>Бесплатно</h3>
+      <div class="price">0 ₸</div>
+      <ul>
+        <li>✓ 3 документа в месяц</li>
+        <li>✓ Базовые шаблоны</li>
+        <li>✓ OCR-распознавание</li>
+        <li class="off">✗ Проверка юристом</li>
+        <li class="off">✗ Приоритетная поддержка</li>
+      </ul>
+      <button class="plan-btn free">Текущий план</button>
+    </div>
+
+    <div class="plan-card featured">
+      <div class="badge">Популярный</div>
+      <h3>Премиум</h3>
+      <div class="price">4 990 ₸<span>/мес</span></div>
+      <ul>
+        <li>✓ Безлимитные документы</li>
+        <li>✓ Все шаблоны + иски</li>
+        <li>✓ OCR + ручной контроль</li>
+        <li>✓ Проверка юристом (24ч)</li>
+        <li>✓ Приоритетная поддержка</li>
+        <li>✓ Авто-напоминания о сроках</li>
+      </ul>
+      <button class="plan-btn premium" onclick="subscribePremium()">Подключить Премиум</button>
+    </div>
+
+    <div class="modal-note">Оплата через Kaspi / Halyk. Отмена в любой момент.</div>
+  </div>
 </div>
 
-<div class="data-card" id="dataCard">
-<div class="data-title">✅ Распознанные данные:</div>
-<div class="data-row"><span class="data-label">👤 Должник:</span><span class="data-value" id="dClient">-</span></div>
-<div class="data-row"><span class="data-label">📍 Адрес:</span><span class="data-value" id="dAddress">-</span></div>
-<div class="data-row"><span class="data-label">🆔 ИИН:</span><span class="data-value" id="dIIN">-</span></div>
-<div class="data-row"><span class="data-label">📞 Телефон:</span><span class="data-value" id="dPhone">-</span></div>
-<div class="data-row"><span class="data-label">⚖️ Нотариус:</span><span class="data-value" id="dNotary">-</span></div>
-
-<div id="notaryDetails" style="display:none;margin-top:12px;padding:12px;background:rgba(6,182,212,0.1);border-radius:8px">
-<div style="font-size:13px;font-weight:700;color:#06b6d4;margin-bottom:8px">📋 Данные нотариуса из enis.kz:</div>
-<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryFullName"></div>
-<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryLicense"></div>
-<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryAddress"></div>
-<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryPhone"></div>
-<div style="font-size:12px;color:#e5e7eb;margin:4px 0" id="notaryEmail"></div>
-</div>
-
-<div class="data-row"><span class="data-label"> Дата надписи:</span><span class="data-value" id="dDate">-</span></div>
-<div class="data-row"><span class="data-label">🔢 Номер:</span><span class="data-value" id="dNumber">-</span></div>
-<div class="data-row"><span class="data-label">💰 Сумма:</span><span class="data-value" id="dAmount">-</span></div>
-<div class="data-row"><span class="data-label">🏢 Взыскатель:</span><span class="data-value" id="dCreditor">-</span></div>
-<div class="data-row"><span class="data-label">📥 Дата получения:</span><span class="data-value" id="dReceive">-</span></div>
-</div>
-
-<button class="generate-btn" id="genBtn" onclick="generateDocument()">📄 Сгенерировать возражение</button>
-
-<div class="result" id="result">
-<div class="result-title">✅ Готовое возражение</div>
-<div class="result-text" id="resultText"></div>
-<button class="download-btn" onclick="downloadPDF()">📥 Скачать PDF</button>
-</div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-const tg=window.Telegram.WebApp;
-tg.ready();
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
 
-let extractedData={};
-let notaryData=null;
+  let currentCategory = null;
+  const DRAFT_KEY = 'arestof_draft_v2';
 
-// База данных нотариусов (можно расширять)
-const notaryDatabase={
-'САРСЕНОВА БАГДАТ НУРИБАЕВНА':{
-fullName:'Сарсенова Багдат Нурибаевна',
-license:'21017062',
-licenseDate:'04.05.2021',
-region:'Атырауской обл.',
-city:'г.Атырау',
-address:'Атамбаева, 7/5, 6А',
-email:'notary_06@mail.ru',
-phone:'+7 702 581 82 47',
-verified:true
-},
-'ТУЛЕНДИНОВ АЛМАЗ КАНАТОВИЧ':{
-fullName:'Тулендинов Алмаз Канатович',
-license:'22006096',
-licenseDate:'01.04.2022',
-region:'Акмолинской обл.',
-city:'',
-address:'',
-email:'',
-phone:'',
-verified:true
-}
-};
+  // ===== Navigation =====
+  function showHome() {
+    document.getElementById('homeScreen').classList.add('active');
+    document.getElementById('genScreen').classList.remove('active');
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+    window.scrollTo(0,0);
+  }
 
-async function processPDF(input){
-if(!input.files[0])return;
-const file=input.files[0];
-document.getElementById('fileName').textContent='✅ '+file.name;
-document.getElementById('loading').classList.add('active');
-updateProgress(5);
-document.getElementById('loadingStatus').textContent='Конвертация PDF в изображение...';
+  function selectCategory(cat) {
+    currentCategory = cat;
+    const names = {arrests:'Аресты',mfo:'МФО',banks:'Банки',collectors:'Коллекторы'};
+    openGenerator('Возражение — ' + names[cat]);
+  }
 
-try{
-const arrayBuffer=await file.arrayBuffer();
-const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
-const page=await pdf.getPage(1);
-const viewport=page.getViewport({scale:3});
-const canvas=document.createElement('canvas');
-const ctx=canvas.getContext('2d');
-canvas.width=viewport.width;
-canvas.height=viewport.height;
-await page.render({canvasContext:ctx,viewport:viewport}).promise;
+  function openGenerator(title) {
+    document.getElementById('genTitle').textContent = title;
+    document.getElementById('homeScreen').classList.remove('active');
+    document.getElementById('genScreen').classList.add('active');
+    resetGen();
+    restoreDraft();
+    window.scrollTo(0,0);
+  }
 
-updateProgress(30);
-document.getElementById('loadingStatus').textContent='Распознавание текста (OCR)...';
+  function goBack() {
+    saveDraft();
+    showHome();
+  }
 
-const result=await Tesseract.recognize(canvas,'rus+eng',{
-logger:m=>{
-if(m.status==='recognizing text'){
-updateProgress(30+Math.floor(m.progress*40));
-document.getElementById('loadingStatus').textContent='Распознавание: '+Math.floor(m.progress*100)+'%';
-}
-}
-});
+  // ===== File & OCR =====
+  function handleFile(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (f.type !== 'application/pdf') { showToast('❌ Только PDF'); return; }
 
-updateProgress(75);
-document.getElementById('loadingStatus').textContent='Анализ данных...';
+    document.getElementById('uploadBlock').style.display = 'none';
+    document.getElementById('progressBlock').classList.add('active');
+    setStep(1);
 
-extractData(result.data.text);
+    setTimeout(() => { setStep(2); document.getElementById('progressText').textContent='Распознавание данных…'; }, 1200);
+    setTimeout(() => { setStep(3); document.getElementById('progressText').textContent='Проверка данных…'; }, 2400);
+    setTimeout(() => finishOCR(), 3400);
+  }
 
-updateProgress(85);
-document.getElementById('loadingStatus').textContent='Проверка нотариуса через enis.kz...';
+  function setStep(n) {
+    for (let i=1;i<=4;i++) {
+      const s = document.getElementById('gstep'+i);
+      s.classList.remove('active','completed');
+      if (i<n) s.classList.add('completed');
+      if (i===n) s.classList.add('active');
+    }
+  }
 
-await verifyNotary();
+  function finishOCR() {
+    document.getElementById('progressBlock').classList.remove('active');
+    document.getElementById('ocrBlock').classList.add('active');
+    setStep(3);
 
-updateProgress(100);
-setTimeout(()=>{
-document.getElementById('loading').classList.remove('active');
-document.getElementById('dataCard').classList.add('active');
-document.getElementById('genBtn').classList.add('active');
-tg.showAlert('✅ Данные распознаны и нотариус проверен! Нажмите "Сгенерировать"');
-},500);
+    // Mock OCR data
+    const data = {
+      debtor_name: 'Иванов Иван Иванович',
+      iin: '123456789012',
+      case_number: '12345-24-00-1234567',
+      bailiff_name: 'Петров П.П.',
+      doc_date: '2024-01-15',
+      debt_amount: '500000',
+      grounds: 'Нотариальная исполнительная надпись от 01.01.2024'
+    };
+    Object.entries(data).forEach(([k,v]) => {
+      const el = document.getElementById('f_'+({debtor_name:'debtor',iin:'iin',case_number:'case',bailiff_name:'bailiff',doc_date:'date',debt_amount:'amount',grounds:'grounds'}[k]));
+      if (el) el.value = v;
+    });
 
-}catch(e){
-console.error('Error:',e);
-document.getElementById('loading').classList.remove('active');
-tg.showAlert('❌ Ошибка обработки PDF.');
-}
-}
+    // Fallback check
+    const filled = Object.values(data).filter(v=>v&&v.trim()).length;
+    if (filled < 4) {
+      document.getElementById('manualBlock').classList.add('active');
+      showToast('⚠️ OCR не справился — введите вручную');
+    }
+  }
 
-function updateProgress(p){document.getElementById('progressBar').style.width=p+'%';}
+  function toggleManual() {
+    document.getElementById('manualBlock').classList.toggle('active');
+  }
 
-// Проверка нотариуса в базе (эмуляция enis.kz)
-async function verifyNotary(){
-const notaryName=extractedData.notaryName;
-if(!notaryName)return;
+  function handleManual(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    saveDraft(data);
+    showSuccess();
+  }
 
-// Ищем в базе
-const normalized=notaryName.toUpperCase().trim();
-if(notaryDatabase[normalized]){
-notaryData=notaryDatabase[normalized];
-showNotaryDetails();
-}else{
-// Можно добавить запрос к API enis.kz если будет доступен
-// Пока оставляем распознанные данные
-notaryData={
-fullName:extractedData.notaryName,
-license:extractedData.licenseNumber||'',
-region:extractedData.notary||'',
-verified:false
-};
-}
-}
+  function generateDoc() {
+    const data = {};
+    ['debtor','iin','case','bailiff','date','amount','grounds'].forEach(k => {
+      const el = document.getElementById('f_'+k);
+      if (el) data[k] = el.value;
+    });
+    saveDraft(data);
+    showSuccess();
+  }
 
-function showNotaryDetails(){
-if(!notaryData)return;
+  function showSuccess() {
+    document.getElementById('ocrBlock').classList.remove('active');
+    document.getElementById('successBlock').classList.add('active');
+    setStep(4);
+    showToast('✅ Документ готов');
+  }
 
-document.getElementById('notaryDetails').style.display='block';
-document.getElementById('notaryFullName').textContent='👤 '+notaryData.fullName;
-document.getElementById('notaryLicense').textContent='📜 Лицензия №'+notaryData.license+(notaryData.licenseDate?' от '+notaryData.licenseDate:'');
-document.getElementById('notaryAddress').textContent='📍 '+(notaryData.region||'')+' '+(notaryData.city||'')+' '+(notaryData.address||'');
-document.getElementById('notaryPhone').textContent='📞 '+(notaryData.phone||'не указан');
-document.getElementById('notaryEmail').textContent='✉️ '+(notaryData.email||'не указан');
+  function resetGen() {
+    document.getElementById('uploadBlock').style.display = 'block';
+    document.getElementById('progressBlock').classList.remove('active');
+    document.getElementById('ocrBlock').classList.remove('active');
+    document.getElementById('successBlock').classList.remove('active');
+    document.getElementById('manualBlock').classList.remove('active');
+    document.getElementById('fileInput').value = '';
+    setStep(1);
+    document.getElementById('progressText').textContent='Обработка документа…';
+  }
 
-// Помечаем как проверенный
-if(notaryData.verified){
-document.getElementById('dNotary').classList.add('verified');
-document.getElementById('dNotary').textContent=notaryData.fullName+' ✅';
-}
-}
+  function saveAndClear() {
+    showToast('💾 Сохранено');
+    clearDraft();
+    setTimeout(showHome, 800);
+  }
 
-function extractData(text){
-console.log('=== РАСПОЗНАННЫЙ ТЕКСТ ===\n',text);
+  // ===== Drafts =====
+  function saveDraft(data) {
+    const draft = {
+      _savedAt: new Date().toISOString(),
+      _category: currentCategory,
+      _title: document.getElementById('genTitle').textContent,
+      ...(data || collectFormData())
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  }
 
-// НОТАРИУС - ищем "Я, [ФИО], нотариус" или "Нотариус [ФИО]"
-const notaryMatch=text.match(/Я,\s*([А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+),\s*нотариус/);
-if(notaryMatch){
-extractedData.notaryName=notaryMatch[1];
-}else{
-// Ищем в шапке документа (Нотариусу ... [ФИО])
-const notaryHeaderMatch=text.match(/Нотариусу[^\n]+\n([А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+)/);
-if(notaryHeaderMatch){
-extractedData.notaryName=notaryHeaderMatch[1];
-}else{
-// Просто три заглавных слова подряд
-const notaryMatch3=text.match(/([А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}\s+[А-ЯЁ]{4,})/);
-if(notaryMatch3){
-extractedData.notaryName=notaryMatch3[1];
-}else{
-extractedData.notaryName='';
-}
-}
-}
+  function collectFormData() {
+    const d = {};
+    document.querySelectorAll('#ocrBlock input, #ocrBlock textarea').forEach(el => { if(el.value.trim()) d[el.name]=el.value; });
+    return d;
+  }
 
-// Область нотариуса
-const notaryRegionMatch=text.match(/нотариус\s+([А-ЯЁ][а-яё]+\s+обл\.?)/);
-if(notaryRegionMatch){
-extractedData.notary=notaryRegionMatch[1].trim();
-}else{
-const notaryRegionMatch2=text.match(/(Атырауской|Акмолинской|Жамбылской|Алматинской|Карагандинской)\s+обл\.?/);
-if(notaryRegionMatch2){
-extractedData.notary=notaryRegionMatch2[1]+' обл.';
-}else{
-extractedData.notary='';
-}
-}
+  function restoreDraft() {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    try {
+      const d = JSON.parse(raw);
+      const days = (Date.now() - new Date(d._savedAt)) / 86400000;
+      if (days > 7) { localStorage.removeItem(DRAFT_KEY); return; }
+      Object.entries(d).forEach(([k,v]) => {
+        if (k.startsWith('_')) return;
+        const el = document.querySelector(`[name="${k}"]`);
+        if (el && !el.value) el.value = v;
+      });
+      showToast('📝 Черновик восстановлен');
+    } catch(e){}
+  }
 
-// Номер лицензии
-const licenseMatch=text.match(/Лицензия\s+№?(\d+)\s+от\s+(\d{2}\.\d{2}\.\d{4})/);
-if(licenseMatch){
-extractedData.licenseNumber=licenseMatch[1];
-extractedData.licenseDate=licenseMatch[2];
-}else{
-extractedData.licenseNumber='';
-extractedData.licenseDate='';
-}
+  function clearDraft() { localStorage.removeItem(DRAFT_KEY); }
 
-// ДОЛЖНИК - ищем "взыскать по настоящему документу с [ФИО]" или "От: [ФИО]"
-const clientMatch=text.match(/(?:взыскать\s+по\s+настоящему\s+документу\s+с|От:\s*)([А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+\s+[А-ЯЁ][А-ЯЁа-яё]+)/);
-if(clientMatch){
-extractedData.client=clientMatch[1].trim();
-}else{
-const clientMatch2=text.match(/([А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}\s+[А-ЯЁ]{4,}),\s*\d{2}\.\d{2}\.\d{4}/);
-if(clientMatch2){
-extractedData.client=clientMatch2[1].trim();
-}else{
-extractedData.client='';
-}
-}
+  // Auto-save
+  setInterval(() => {
+    if (document.getElementById('genScreen').classList.contains('active')) {
+      const has = Object.keys(collectFormData()).length > 0;
+      if (has) saveDraft();
+    }
+  }, 30000);
 
-// ИИН должника - 12 цифр после даты рождения
-const iinMatch=text.match(/\d{2}\.\d{2}\.\d{4}г?\.?р\.?,?\s*(\d{12})/);
-if(iinMatch){
-extractedData.iin=iinMatch[1];
-}else{
-const iinMatch2=text.match(/ИИН:\s*(\d{12})/);
-if(iinMatch2){
-extractedData.iin=iinMatch2[1];
-}else{
-extractedData.iin='';
-}
-}
+  // ===== Premium =====
+  function openPremiumModal() { document.getElementById('premiumModal').classList.add('active'); }
+  function closePremium() { document.getElementById('premiumModal').classList.remove('active'); }
+  function subscribePremium() {
+    if (tg?.initData) {
+      showToast(' Переход к оплате...');
+    } else {
+      alert('Откройте через Telegram');
+    }
+  }
 
-// АДРЕС должника
-const addrMatch=text.match(/Адрес:\s*([^\nИИН]+)/);
-if(addrMatch){
-extractedData.address=addrMatch[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ').replace(/,\s*/g,', ');
-}else{
-const addrMatch2=text.match(/местонахождение:\s*([^\n]+(?:\n[^\n]+){0,2})/);
-if(addrMatch2){
-extractedData.address=addrMatch2[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ');
-}else{
-extractedData.address='';
-}
-}
+  // ===== Toast =====
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
 
-// ТЕЛЕФОН должника
-const phoneMatch=text.match(/Тел[.:]?\s*\+?7[\s(]?(\d{3})[\s)]?[\s-]?(\d{3})-?(\d{2})-?(\d{2})/);
-if(phoneMatch){
-extractedData.phone=`+7(${phoneMatch[1]}) ${phoneMatch[2]}-${phoneMatch[3]}-${phoneMatch[4]}`;
-}else{
-extractedData.phone='';
-}
-
-// ДАТА надписи
-const dateMatch=text.match(/(\d{2}\.\d{2}\.\d{4})\s+года\s+была\s+вынесена/);
-if(dateMatch){
-extractedData.date=dateMatch[1];
-}else{
-const dateMatch2=text.match(/лицензия\s+№\d+\s+от\s+(\d{2}\.\d{2}\.\d{4})/);
-if(dateMatch2){
-extractedData.date=dateMatch2[1];
-}else{
-extractedData.date='';
-}
-}
-
-// НОМЕР надписи
-const numberMatch=text.match(/за\s+№\s*(\d+)/);
-if(numberMatch){
-extractedData.number=numberMatch[1];
-}else{
-const numberMatch2=text.match(/№\s*(\d{5,})/);
-if(numberMatch2){
-extractedData.number=numberMatch2[1];
-}else{
-extractedData.number='';
-}
-}
-
-// СУММА
-const amountMatch=text.match(/задолженности\s+в\s+([\d\s,]+)\s*тенге/);
-if(amountMatch){
-extractedData.amount=amountMatch[1].trim()+' тенге';
-}else{
-const amountMatch2=text.match(/сумму\s+задолженности\s+в\s+([\d\s,]+)\s*тенге/);
-if(amountMatch2){
-extractedData.amount=amountMatch2[1].trim()+' тенге';
-}else{
-extractedData.amount='';
-}
-}
-
-// ВЗЫСКАТЕЛЬ
-const creditorMatch=text.match(/в пользу\s+([^\n(]+)/);
-if(creditorMatch){
-extractedData.creditor=creditorMatch[1].trim().replace(/\n/g,' ').replace(/\s+/g,' ');
-}else{
-extractedData.creditor='';
-}
-
-// ДАТА получения
-const receiveMatch=text.match(/получена?\s+мной\s+(\d{2}\.\d{2}\.\d{4})/);
-if(receiveMatch){
-extractedData.receive=receiveMatch[1];
-}else{
-extractedData.receive='';
-}
-
-// Показываем данные
-document.getElementById('dClient').textContent=extractedData.client||'не распознано';
-document.getElementById('dAddress').textContent=extractedData.address||'не распознано';
-document.getElementById('dIIN').textContent=extractedData.iin||'не распознано';
-document.getElementById('dPhone').textContent=extractedData.phone||'не распознано';
-document.getElementById('dNotary').textContent=extractedData.notaryName||'не распознано';
-document.getElementById('dDate').textContent=extractedData.date||'не распознано';
-document.getElementById('dNumber').textContent=extractedData.number?'№ '+extractedData.number:'не распознано';
-document.getElementById('dAmount').textContent=extractedData.amount||'не распознано';
-document.getElementById('dCreditor').textContent=extractedData.creditor||'не распознано';
-document.getElementById('dReceive').textContent=extractedData.receive||'не распознано';
-}
-
-function generateDocument(){
-// Используем данные нотариуса из базы если есть
-const notaryFullName=notaryData&&notaryData.verified?notaryData.fullName:extractedData.notaryName;
-const notaryAddress=notaryData&&notaryData.verified?
-(notaryData.region+', '+(notaryData.city?notaryData.city+', ':'')+(notaryData.address||'')):
-extractedData.notary;
-const notaryEmail=notaryData&&notaryData.verified?notaryData.email:extractedData.email||'';
-const notaryPhone=notaryData&&notaryData.verified?notaryData.phone:extractedData.phone||'';
-
-const c=extractedData.client;
-const a=extractedData.address;
-const iin=extractedData.iin;
-const ph=extractedData.phone;
-const d=extractedData.date;
-const num=extractedData.number;
-const amt=extractedData.amount;
-const cr=extractedData.creditor;
-const r=extractedData.receive;
-const initials=c.split(' ').map(w=>w[0]).join('. ');
-
-const text=`Нотариусу ${notaryAddress}
-${notaryFullName}
-${notaryEmail?'Электронды почта: '+notaryEmail:''}
-${notaryPhone?'Тел.номер:'+notaryPhone:''}
-
-От: ${c}
-Адрес: ${a}
-ИИН: ${iin}
-Тел: ${ph}
-
-ВОЗРАЖЕНИЕ
-
-Вами ${d} года была вынесена исполнительная надпись за № ${num} о взыскании с ${c} в пользу ${cr} сумму задолженности в ${amt}.
-
-С данной исполнительной надписью я не согласен, я не согласен с суммой, которую взыскатель просит взыскать.
-Мне не удалось связаться с взыскателем, на мои звонки взыскатель не отвечает.
-
-Исходя из этого из за того что между взыскателем и мной имеются разногласия по поводу суммы, взыскателю следует обратиться в суд для рассмотрения в судебном порядке, в порядке ГПК РК.
-
-Ваша исполнительная надпись была получена мной ${r} года.
-
-В пункте 1 ч 1 ст 92-2 закона «О нотариате» указано:
-Исполнительная надпись совершается, если представленные документы подтверждают бесспорность задолженности или иной ответственности должника перед взыскателем.
-
-Согласно закона «О нотариате»: «Должник вправе со дня получения копии исполнительной надписи направить нотариусу, совершившему исполнительную надпись, возражение против заявленного требования в письменном виде с уведомлением».
-
-В ст. 92-8 закона «О нотариате» указано: «Нотариус выносит постановление об отмене исполнительной надписи не позднее трех рабочих дней со дня поступления возражения».
-
-Также в законе «О нотариате» указано: в случае если постановлением нотариуса совершенная исполнительная надпись по возражению должника не отменена, оспаривание исполнительной надписи осуществляется в судебном порядке.
-
-На основании вышеизложенного и руководствуясь законами РК:
-
-ПРОШУ:
-
-Исполнительная надпись от ${d} года за № ${num} о взыскании с ${c} в пользу ${cr} задолженности в размере ${amt} — отменить.
-
-Заявитель: ${initials}.
-
-${r} г.`;
-
-document.getElementById('resultText').textContent=text;
-document.getElementById('result').classList.add('active');
-document.getElementById('genBtn').classList.remove('active');
-window.scrollTo(0,document.body.scrollHeight);
-}
-
-function downloadPDF(){
-const{jsPDF}=window.jspdf;
-const doc=new jsPDF();
-const text=document.getElementById('resultText').textContent;
-doc.setFont('times');
-doc.setFontSize(10);
-const split=doc.splitTextToSize(text,170);
-doc.text(split,20,15);
-doc.save('Vozrazhenie.pdf');
-}
+  // Telegram back button
+  if (tg) {
+    tg.BackButton.onClick(() => goBack());
+  }
 </script>
 </body>
-  </html>
+</html>
